@@ -34,6 +34,7 @@ public:
    void                   UsePlainAlphaGain();
    void                   ApplyBiasCurrentCorrection(MeasInfo *measInfo, bool direct);
    virtual void           Calibrate(DrawObjContainer* c);
+   Float_t                GetEffectiveGain(UShort_t chId) const;
    virtual Float_t        GetDLWidth(UShort_t chId) const;
    virtual Float_t        GetDLWidthErr(UShort_t chId) const;
    virtual Float_t        GetT0Coef(UShort_t chId) const;

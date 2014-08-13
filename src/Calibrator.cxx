@@ -174,6 +174,13 @@ void Calibrator::Calibrate(DrawObjContainer *c)
 
 
 /** */
+Float_t Calibrator::GetEffectiveGain(UShort_t chId) const
+{
+   return fChannelCalibs.find(chId)->second.fEffectiveGain;
+}
+
+
+/** */
 Float_t Calibrator::GetDLWidth(UShort_t chId) const
 {
    return fChannelCalibs.find(chId)->second.fDLWidth;
