@@ -39,6 +39,7 @@ public:
    UChar_t  GetDetectorId()   const { return (UShort_t) (fEventId.fChannelId / NSTRIP_PER_DETECTOR) + 1; }
    UInt_t   GetRevolutionId() const { return fEventId.fRevolutionId; }
    UChar_t  GetChannelId()    const { return fEventId.fChannelId + 1; }
+   UChar_t  GetChannelIndex() const { return fEventId.fChannelId; }
    UChar_t  GetBunchId()      const { return fEventId.fBunchId; }
    UShort_t GetDelimiterId()  const { return fEventId.fDelimiterId; }
    UChar_t  GetAmpltd()       const { return fChannel.fAmpltd; }
