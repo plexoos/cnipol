@@ -26,6 +26,7 @@ public:
    ~Calibrator();
 
    virtual void           UpdateMeanChannel();
+   ChannelCalib const&    GetChannelCalib(uint16_t chId) const { return fChannelCalibs.find(chId)->second; }
    ChannelCalib const&    GetMeanChannel() const { return fMeanChannel; }
    ChannelCalib const&    GetMeanOfLogsChannel() const { return fMeanOfLogsChannel; }
    Float_t                GetRMSBananaChi2Ndf() const { return fRMSBananaChi2Ndf; }
