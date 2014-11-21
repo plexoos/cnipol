@@ -99,7 +99,7 @@ struct less<ChannelEvent>
 {
      bool operator() (const ChannelEvent& x, const ChannelEvent& y) const
      {
-        return x.fEventId < y.fEventId;
+        return x.GetEventId() < y.GetEventId();
      }
 };
 

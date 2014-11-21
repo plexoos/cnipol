@@ -35,7 +35,7 @@ Float_t ChannelEvent::GetKinEnergyA()
 {
    UChar_t chId  = GetChannelId();
    Float_t emeas = GetEnergyA();
-   Float_t eloss = fEventConfig->fCalibrator->fChannelCalibs[chId].fAvrgEMiss;
+   Float_t eloss = fEventConfig->fCalibrator->GetChannelCalib(chId).fAvrgEMiss;
    return  emeas + eloss;
 }
 
@@ -45,7 +45,7 @@ Float_t ChannelEvent::GetKinEnergyAEDepend()
 {
    UChar_t chId    = GetChannelId();
    Float_t emeas   = GetEnergyA();
-   Float_t dlwidth = fEventConfig->fCalibrator->fChannelCalibs[chId].fDLWidth;
+   Float_t dlwidth = fEventConfig->fCalibrator->GetChannelCalib(chId).fDLWidth;
    return  cnipol_toolkit::ekin(emeas, dlwidth);
 }
 
@@ -54,7 +54,7 @@ Float_t ChannelEvent::GetKinEnergyAEDepend()
 Float_t ChannelEvent::GetKinEnergyAEDependAverage()
 {
    Float_t emeas   = GetEnergyA();
-   Float_t dlwidth = fEventConfig->fCalibrator->fChannelCalibs[0].fDLWidth;
+   Float_t dlwidth = fEventConfig->fCalibrator->GetChannelCalib(0).fDLWidth;
    return  cnipol_toolkit::ekin(emeas, dlwidth);
 }
 
@@ -63,7 +63,7 @@ Float_t ChannelEvent::GetKinEnergyAEDependAverage()
 Float_t ChannelEvent::GetKinEnergyAEstimate()
 {
    Float_t emeas = GetEnergyA();
-   Float_t eloss = fEventConfig->fCalibrator->fChannelCalibs[0].fAvrgEMiss;
+   Float_t eloss = fEventConfig->fCalibrator->GetChannelCalib(0).fAvrgEMiss;
    return  emeas + eloss;
 }
 
@@ -72,8 +72,8 @@ Float_t ChannelEvent::GetKinEnergyAEstimate()
 Float_t ChannelEvent::GetKinEnergyADLCorrEstimate()
 {
    Float_t emeas = GetEnergyA();
-   Float_t eloss = fEventConfig->fCalibrator->fChannelCalibs[0].fAvrgEMiss;
-   Float_t eMeasDLCorr = fEventConfig->fCalibrator->fChannelCalibs[0].fEMeasDLCorr;
+   Float_t eloss = fEventConfig->fCalibrator->GetChannelCalib(0).fAvrgEMiss;
+   Float_t eMeasDLCorr = fEventConfig->fCalibrator->GetChannelCalib(0).fEMeasDLCorr;
 
    return  emeas*eMeasDLCorr + eloss;
 }
@@ -83,7 +83,7 @@ Float_t ChannelEvent::GetKinEnergyADLCorrEstimate()
 Float_t ChannelEvent::GetKinEnergyAEstimateEDepend()
 {
    Float_t emeas   = GetEnergyA();
-   Float_t dlwidth = fEventConfig->fCalibrator->fChannelCalibs[0].fDLWidth;
+   Float_t dlwidth = fEventConfig->fCalibrator->GetChannelCalib(0).fDLWidth;
    return  cnipol_toolkit::ekin(emeas, dlwidth);
 }
 
@@ -103,7 +103,7 @@ Float_t ChannelEvent::GetEnergyI()
    UChar_t chId = fEventId.fChannelId + 1;
    // XXX acoef has to be changed to ... icoef
    //return fEventConfig->fConfigInfo->data.chan[chId].acoef * fChannel.fIntgrl;
-   return fEventConfig->fCalibrator->fChannelCalibs[chId].fAmInt.fCoef * fChannel.fIntgrl;
+   return fEventConfig->fCalibrator->GetChannelCalib(chId).fAmInt.fCoef * fChannel.fIntgrl;
 }
 
 
@@ -125,7 +125,7 @@ Float_t ChannelEvent::GetTime2() const
 Float_t ChannelEvent::GetTimeOfFlight()
 {
    UChar_t chId   = GetChannelId();
-   Float_t t0coef = fEventConfig->fCalibrator->fChannelCalibs[chId].fT0Coef;
+   Float_t t0coef = fEventConfig->fCalibrator->GetChannelCalib(chId).fT0Coef;
 
    return GetTime() + t0coef;
 }
@@ -135,7 +135,7 @@ Float_t ChannelEvent::GetTimeOfFlight()
 Float_t ChannelEvent::GetTimeOfFlight2()
 {
    UChar_t chId   = GetChannelId();
-   Float_t t0coef = fEventConfig->fCalibrator->fChannelCalibs[chId].fT0Coef;
+   Float_t t0coef = fEventConfig->fCalibrator->GetChannelCalib(chId).fT0Coef;
 
    return GetTime2() + t0coef;
 }
@@ -144,7 +144,7 @@ Float_t ChannelEvent::GetTimeOfFlight2()
 /** */
 Float_t ChannelEvent::GetTimeOfFlightEstimate()
 {
-   Float_t t0coef = fEventConfig->fCalibrator->fChannelCalibs[0].fT0Coef;
+   Float_t t0coef = fEventConfig->fCalibrator->GetChannelCalib(0).fT0Coef;
 
    return GetTime() + t0coef;
 }
