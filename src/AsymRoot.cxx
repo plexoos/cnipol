@@ -100,7 +100,7 @@ AsymRoot::AsymRoot() :
 
    gStyle->SetStatBorderSize(1); // removes shadow
 
-   fChannelEvent->fEventConfig = fEventConfig;
+   fChannelEvent->SetEventConfig(fEventConfig);
 }
 
 
@@ -303,14 +303,11 @@ void AsymRoot::CreateTrees()
  */
 void AsymRoot::SetChannelEvent(ATStruct &at, long delim, unsigned chId)
 {
-   fChannelEvent->fEventId.fRevolutionId = delim*512 + at.rev*2 + at.rev0;
-   fChannelEvent->fEventId.fBunchId      = at.b;
-   fChannelEvent->fEventId.fChannelId    = chId;
-   fChannelEvent->fEventId.fDelimiterId  = delim;
-   fChannelEvent->fChannel.fAmpltd       = at.a;
-   fChannelEvent->fChannel.fIntgrl       = at.s;
-   fChannelEvent->fChannel.fTdc          = at.t;
-   fChannelEvent->fChannel.fTdcAMax      = at.tmax;
+	ChannelEventId chEventId(delim*512 + at.rev*2 + at.rev0, at.b, chId, delim);
+   ChannelData chData(at.a, at.s, at.t, at.tmax);
+
+	fChannelEvent->SetEventId(chEventId);
+	fChannelEvent->SetChannelData(chData);
 }
 
 
@@ -654,8 +651,8 @@ void AsymRoot::SaveChannelTrees()
    ChannelEventSet::iterator me = fChannelEvents.end();
 
    for (mi=mb; mi!=me; mi++) {
-      *fChannelData = (mi->fChannel);
-      fChannelEventTrees[mi->fEventId.fChannelId]->Fill();
+      *fChannelData = mi->GetChannelData();
+      fChannelEventTrees[mi->GetChannelIndex()]->Fill();
    }
 }
 
@@ -677,13 +674,13 @@ void AsymRoot::SaveEventTree()
 
    for (mi=mb; mi!=me; mi++) {
 
-      fAnaEvent->fEventId = mi->fEventId;
-      fAnaEvent->fChannels[mi->fEventId.fChannelId] = mi->fChannel;
+      fAnaEvent->fEventId = mi->GetEventId();
+      fAnaEvent->fChannels[mi->GetChannelIndex()] = mi->GetChannelData();
 
       // Pointer to the next element, can be end of map
       nextmi = mi; nextmi++;
 
-      if (fAnaEvent->fEventId < nextmi->fEventId || nextmi == me) {
+      if (fAnaEvent->fEventId < nextmi->GetEventId() || nextmi == me) {
 
          fAnaEventTree->Fill();
          fAnaEvent->fChannels.clear();
