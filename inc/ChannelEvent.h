@@ -28,15 +28,14 @@ class ChannelEvent : public TObject
 {
 public:
 
-   EventConfig    *fEventConfig; //!
-	ChannelEventId  fEventId;
-   ChannelData     fChannel;
-
-public:
-
    ChannelEvent();
    ~ChannelEvent();
 
+   void SetEventConfig(EventConfig* eventConfig) { fEventConfig = eventConfig; }
+   void SetEventId(ChannelEventId& chEventId) { fEventId = chEventId; }
+   void SetChannelData(ChannelData& chData) { fChannel = chData; }
+   ChannelData GetChannelData() const { return fChannel; }
+   ChannelEventId GetEventId() const { return fEventId; }
    UChar_t  GetDetectorId()   const { return (UShort_t) (fEventId.fChannelId / NSTRIP_PER_DETECTOR) + 1; }
    UInt_t   GetRevolutionId() const { return fEventId.fRevolutionId; }
    UChar_t  GetChannelId()    const { return fEventId.fChannelId + 1; }
@@ -83,6 +82,12 @@ public:
    Bool_t PassCutEmptyBunch() const;
    Bool_t PassCutStepperChannel() const;
    Bool_t IsSpinFlipperMarkerChannel() const;
+
+private:
+
+   EventConfig    *fEventConfig; //!
+   ChannelEventId  fEventId;
+   ChannelData     fChannel;
 
    ClassDef(ChannelEvent, 1)
 };
