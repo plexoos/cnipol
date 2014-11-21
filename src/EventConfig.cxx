@@ -56,13 +56,6 @@ void EventConfig::PrintAsPhp(FILE *f) const
 {
    fprintf(f, "<?php\n");
 
-   //fprintf(f, "\n// TRecordConfigRhicStruct data\n");
-   //if (!fConfigInfo) {
-   //   Error("PrintAsPhp", "fConfigInfo not defined");
-   //} else {
-   //   fprintf(f, "$rc['data']['NumChannels'] = %d;\n", fConfigInfo->data.NumChannels);
-   //}
-
    fprintf(f, "\n// MeasInfo data\n");
    if (!fMeasInfo) {
       Error("PrintAsPhp", "fMeasInfo not defined");
@@ -135,10 +128,6 @@ string EventConfig::GetSignature() const
 
       strSignature = fAnaInfo->GetRunName() + ": Recorded " + strMeasStartTime + ", "
                      + " Analyzed " + strAnaEndTime;
-                     //+ fAnaInfo->fUserGroup.fRealName + " @ " + strAnaEndTime;
-
-      //if (strSignature.size() != 0) 
-      //   strSignature += ", ";
 
       strSignature += ", Version " + fAnaInfo->GetShortAsymVersion() + ", " + fAnaInfo->fUserGroup.fUser;
    }

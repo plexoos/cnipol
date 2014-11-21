@@ -134,13 +134,11 @@ MeasInfo                 *gMeasInfo;
 AnaMeasResult            *gAnaMeasResult;
 AsymRoot                 *gAsymRoot;
 UShort_t                 *gCh2WfdMap = 0;
-//AsymDb                   *gAsymDb;
 DbEntry                   gRunDb;
 RunConfig                 gRunConfig;
 atdata_struct             atdata;
 StructAverage             average;
 StructFeedBack            feedback;
-//RunConst                 runconst;
 map<UShort_t, RunConst>   gRunConsts;
 TRecordConfigRhicStruct  *gConfigInfo;
 TargetInfo                tgt;
@@ -273,28 +271,15 @@ TBuffer & operator<<(TBuffer &buf, TRecordConfigRhicStruct *&rec)
 /** */
 TBuffer & operator>>(TBuffer &buf, TRecordConfigRhicStruct *&rec)
 {
-   //printf("operator>>(TBuffer &buf, TRecordConfigRhicStruct *rec) : \n");
-   //if (!rec) return buf; // of course it is 0!
    int nChannels;
    buf >> nChannels;
-   //printf("nChannels: %d\n", nChannels);
-   // delete memory allocated by default if any
-   //delete rec;
    free(rec);
    rec = (TRecordConfigRhicStruct *) realloc(rec, sizeof(TRecordConfigRhicStruct) +
-   //rec = (TRecordConfigRhicStruct *) malloc(sizeof(TRecordConfigRhicStruct) +
          (nChannels)*sizeof(SiChanStruct));
    rec->Streamer(buf);
 
    return buf;
 }
-
-
-//std::string strip(std::string const& str, char const* sepSet)
-//{
-//   std::string::size_type const first = str.find_first_not_of(sepSet);
-//   return ( first==std::string::npos ) ? std::string() : str.substr(first, str.find_last_not_of(sepSet)-first+1);
-//}
 
 
 // Return Maximum from array A[N]. Ignores ASYM_DEFAULT as an exception
@@ -444,9 +429,7 @@ void ReadRampTiming(char *filename)
 /** */
 ostream& operator<<(ostream &os, const TgtOrient2ValErrMap &vep)
 {
-   //os << "array( " << vep.first << ", " << vep.second << " )";
    os << MapAsPhpArray<ETargetOrient, ValErrPair>(vep);
-
    return os;
 }
 
@@ -455,9 +438,6 @@ ostream& operator<<(ostream &os, const TgtOrient2ValErrMap &vep)
 string PairAsPhpArray(const ValErrPair &p)
 {
    std::stringstream sstr("");
-
    sstr << p;
-   //sstr << "array (" << p.first << ", " << p.second << ")";
-
    return sstr.str();
 }

@@ -57,20 +57,11 @@ MeasInfo::MeasInfo() : TObject(),
    fDisabledChannels(),
    fBeamBunches()
 {
-   //for (int i=0; i<N_DETECTORS; i++) ActiveDetector[i] = 0xFFF;
-   //ActiveDetector        = { 0xFFF, 0xFFF, 0xFFF, 0xFFF, 0xFFF, 0xFFF };// ActiveDetector[N_DETECTORS]
-
    for (int i=1; i<=N_SILICON_CHANNELS; i++) {
       fSiliconChannels.insert(i);
    }
 
-   //NActiveStrip  = N_SILICON_CHANNELS; // NAactiveStrip;
-   //NDisableStrip = 0;      // NDisableStrip
-   //NDisableBunch = 0;      // NDisableBunch,
-
    for (int i=0; i<N_BUNCHES; i++) {
-      //DisableBunch[i] = 0;
-
       BeamBunch bbunch;
       fBeamBunches[i+1] = bbunch;
    }
@@ -178,42 +169,9 @@ void MeasInfo::PrintAsPhp(FILE *f) const
 
    stringstream ssChs("");
 
-   //ssChs << "array(";
-   //for (int i=0; i!=N_DETECTORS; i++) {
-   //   ssChs << noshowbase << dec << i+1 << " => " << showbase << hex << ActiveDetector[i];
-   //   ssChs << (i<N_DETECTORS-1 ? ", " : "");
-   //}
-   //ssChs << ")";
-   //fprintf(f, "$rc['ActiveDetector']               = %s;\n", ssChs.str().c_str());
-
-   //ssChs << dec << noshowbase;
-
-   //ssChs.str("");
-   //ssChs << "array(";
-   //for (int i=0; i!=N_SILICON_CHANNELS; i++) {
-   //   ssChs << i+1 << " => " << (ActiveStrip[i] ? "1" : "0");
-   //   ssChs << (i<N_SILICON_CHANNELS-1 ? ", " : "");
-   //}
-   //ssChs << ")";
-   //fprintf(f, "$rc['ActiveStrip']                  = %s;\n", ssChs.str().c_str());
-   //fprintf(f, "$rc['ActiveStrip'][%d]              = %d;\n", i, ActiveStrip[i]);
-
-   //fprintf(f, "$rc['NActiveStrip']                 = %d;\n", NActiveStrip );
-   //fprintf(f, "$rc['NDisableStrip']                = %d;\n", NDisableStrip);
-
-   // Unpack fDisabledChannels
-   //ssChs.str("");
-   //ssChs << "array(";
-   //for (int i=0; i!=N_SILICON_CHANNELS; i++) {
-   //   ssChs << i+1 << " => " << (fDisabledChannels[i] ? "1" : "0");
-   //   ssChs << (i<N_SILICON_CHANNELS-1 ? ", " : "");
-   //}
-   //ssChs << ")";
-
    fprintf(f, "$rc['fSiliconChannels']             = %s;\n", SetAsPhpArray<UShort_t>(fSiliconChannels).c_str());
    fprintf(f, "$rc['fDisabledChannels']            = %s;\n", SetAsPhpArray<UShort_t>(fDisabledChannels).c_str());
    fprintf(f, "$rc['fBeamBunches']                 = %s;\n", MapAsPhpArray<UShort_t, BeamBunch>(fBeamBunches).c_str() );
-   //fprintf(f, "$rc['NDisableBunch']                = %d;\n", NDisableBunch);
    fprintf(f, "$rc['fAlphaSourceCount']            = %d;\n", fAlphaSourceCount);
    fprintf(f, "$rc['fProtoCutSlope']               = %f;\n", fProtoCutSlope);
    fprintf(f, "$rc['fProtoCutOffset']              = %f;\n", fProtoCutOffset);
@@ -285,38 +243,6 @@ void MeasInfo::PrintConfig()
 
    // target count/mm
    fprintf(stdout,"    TARGET_COUNT_MM = %.5f\n", gAsymAnaInfo->target_count_mm);
-
-   // Disabled bunch
-   //fprintf(stdout,"      #DISABLED_BUNCHES = %d\n", NDisableBunch);
-   //if (NDisableBunch){
-   //   fprintf(stdout,"       DISABLED_BUNCHES = ");
-   //   for (int i=0; i<NDisableBunch; i++) printf("%d ", DisableBunch[i]);
-   //   printf("\n");
-   //}
-
-   // Disabled strips
-   //fprintf(stdout,"      #DISABLED_CHANNELS = %d\n", NDisableStrip);
-   //if (NDisableStrip){
-   //  fprintf(stdout,"       DISABLED_CHANNELS = ");
-   //  for (int i=0;i<NDisableStrip;i++) printf("%d ", fDisabledChannels[i]+1);
-   //  printf("\n");
-   //}
-
-   // Active Detector and Strip Configulation
-   //printf("    Active Detector =");
-   //for (int i=0; i<N_DETECTORS; i++)  printf(" %1d", ActiveDetector[i] ? 1 : 0 );
-   //printf("\n");
-
-   //printf("Active Strip Config =");
-   //for (int i=N_DETECTORS-1; i>=0; i--) printf(" %x", ActiveDetector[i]);
-   //printf("\n");
-
-   //printf("Active Strip Config =");
-   //for (int i=0; i<N_SILICON_CHANNELS; i++) {
-   //   if (i%NSTRIP_PER_DETECTOR == 0) printf(" ");
-   //   printf("%d", ActiveStrip[i]);
-   //}
-   //printf("\n");
 
    // print comment
    if (strlen(gRunDb.comment_s.c_str())>3)
@@ -640,11 +566,6 @@ void MeasInfo::SetPolarimetrIdRhicBeam(const char* RunID)
      Error("SetPolarimetrIdRhicBeam", "Unrecognized RHIC beam and Polarimeter-ID. Perhaps calibration data..?");
      break;
   }
-
-  /*
-  fprintf(stdout,"MeasInfo: RunID=%.3f fPolBeam=%d PolarimetryID=%d\n",
-          gMeasInfo->RUNID, gMeasInfo->fPolBeam, gMeasInfo->PolarimetryID);
-  */
 }
 
 
@@ -844,8 +765,6 @@ ETargetOrient MeasInfo::GetTargetOrient() const
 /** */
 UShort_t MeasInfo::GetTargetId() const
 {
-   //string sTgtId(fTargetId);
-   //return (UShort_t) atoi(sTgtId.c_str());
    return (UShort_t) atoi(&fTargetId);
 }
 

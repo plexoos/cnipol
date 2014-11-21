@@ -51,7 +51,6 @@ AnaGlobResult::AnaGlobResult() : TObject(),
       TargetUId      targetUId = iTarget->fUId;
       EPolarimeterId polId     = targetUId.fPolId;
       ETargetOrient  tgtOrient = targetUId.fTargetOrient;
-      //UShort_t       tgtId     = targetUId.fTargetId;
 
       ValErrPair valErrPair(0, -1);
 
@@ -245,7 +244,6 @@ void AnaGlobResult::AddMeasResult(EventConfig &mm, DrawObjContainer *ocIn)
 
    // Do something about the read draw obj container
    if (ocIn) {
-      //oc->Print();
       anaFillResult->AddGraphMeasResult(mm, *ocIn);
    }
 }
@@ -477,18 +475,7 @@ void AnaGlobResult::CalcPolarNorm()
          ValErrPair norm = utils::CalcDivision(polarHJ, polarPC);
          fNormJetCarbon2[polId] = utils::CalcWeightedAvrgErr(fNormJetCarbon2[polId], norm);
 
-         // for debugging
-         //cout << "jjjj " << fillId << " ";
-         //cout << ": " << PairAsPhpArray(norm) << "      " << PairAsPhpArray(fNormJetCarbon2[polId]) << endl;
-         //printf("%d: %s: %16.7f +/- %16.7f   %16.7f +/- %16.7f\n",
-         //   fillId, sPolId.c_str(), polarPC.first, polarPC.second, polarHJ.first, polarHJ.second);
-
          fNormJetCarbonByTarget2[targetUId] = utils::CalcWeightedAvrgErr(fNormJetCarbonByTarget2[targetUId], norm);
-
-         // for debugging
-         //cout << "kkkk " << fillId << " ";
-         //targetUId.Print();
-         //cout << ": " << PairAsPhpArray(norm) << "      " << PairAsPhpArray(fNormJetCarbonByTarget2[targetUId]) << endl;
       }
    }
 
@@ -497,8 +484,6 @@ void AnaGlobResult::CalcPolarNorm()
 
    for ( ; iPolId != gRunConfig.fPolarimeters.end(); ++iPolId)
    {
-      //Info("CalcPolarNorm", "Consider polarimeter %s", RunConfig::AsString(*iPolId).c_str() );
-
       if ( polarCrbSet.find(*iPolId) != polarCrbSet.end() ) {
          ValErrPair avrgCrb = utils::CalcWeightedAvrgErr(polarCrbSet[*iPolId]);
          ValErrPair avrgJet = utils::CalcWeightedAvrgErr(polarJetSet[*iPolId]);
@@ -543,13 +528,6 @@ void AnaGlobResult::CalcAvrgPolProfR()
             fAvrgPCProfRUnWs[polId][tgtOrient] = utils::CalcWeightedAvrgErr(currAvrg, fillPCProfR);
          }
       }
-
-      //if (polarCrb.second < 0 || polarJet.second < 0) continue; // skip if not a valid result
-
-      // for debugging
-      //string sPolId = RunConfig::AsString(polId);
-      //printf("%d: %s: %16.7f +/- %16.7f   %16.7f +/- %16.7f\n",
-      //   fillId, sPolId.c_str(), polarCrb.first, polarCrb.second, polarJet.first, polarJet.second);
    }
 }
 
@@ -578,7 +556,6 @@ void AnaGlobResult::CalcDependencies()
       PolId2ValErrMap  ratioHJ2PC = fillRslt->CalcSystJvsCPolar(fNormJetCarbon2);
       PolId2ValErrMap  ratioP2PP  = fillRslt->CalcSystProfPolar(fNormProfPolar2);
 
-      //
       PolarimeterIdSetConstIter iPolId = gRunConfig.fPolarimeters.begin();
 
       for ( ; iPolId != gRunConfig.fPolarimeters.end(); ++iPolId)
@@ -648,10 +625,6 @@ void AnaGlobResult::UpdateInsertDb(AsymDbSql &asymDbSql) const
       cout << endl;
       Info("UpdateInsert", "fill %d", fillId);
 
-
-      // test
-      //Info("UpdateInsert", "Test Test");
-
       // Save results from the p-Carbon polarimeters
       PolarimeterIdSetIter iPolId = gRunConfig.fPolarimeters.begin();
 
@@ -672,9 +645,6 @@ void AnaGlobResult::UpdateInsertDb(AsymDbSql &asymDbSql) const
 
          nfillP->SetValuesPC(fillResult, polId);
          asymDbSql.UpdateInsert(ofillP, nfillP);
-
-         //TargetUId targetUId = fillRslt->GetPCTarget(polId);
-         //if (!targetUId.IsValid()) continue;
 
          // Profile
          TargetOrientSetIter iTgtOrient = gRunConfig.fTargetOrients.begin();
@@ -725,43 +695,6 @@ void AnaGlobResult::UpdateInsertDb(AsymDbSql &asymDbSql) const
          nfillP->SetValuesHJ(fillResult, ringId);
          asymDbSql.UpdateInsert(ofillP, nfillP);
       }
-      // test end
-      // test end
-      // test end
-      // test end
-
-
-      /*
-      MseFillPolarX *ofill = asymDbSql->SelectFillPolar(fillId);
-      MseFillPolarX *nfill = 0;
-
-      if (ofill) { // if fill found in database copy it to new one
-         nfill = new MseFillPolarX(*ofill);
-      } else { // if fill not found in database create it
-         nfill = new MseFillPolarX(fillId);
-      }
-
-      nfill->SetValues(fillResult);
-      //nfill->Print();
-
-      asymDbSql->UpdateInsert(ofill, nfill);
-
-
-      // Update profile table
-      MseFillProfileX *ofillProf = asymDbSql->SelectFillProfile(fillId);
-      MseFillProfileX *nfillProf = 0;
-
-      if (ofillProf) { // if fill found in database copy it to new one
-         nfillProf = new MseFillProfileX(*ofillProf);
-      } else { // if fill not found in database create it
-         nfillProf = new MseFillProfileX(fillId);
-      }
-
-      nfillProf->SetValues(fillResult);
-      //nfillProf->Print();
-
-      asymDbSql->UpdateInsert(ofillProf, nfillProf);
-      */
    }
 }
 

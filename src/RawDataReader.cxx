@@ -118,7 +118,6 @@ void RawDataReader::ReadRecBegin(MseMeasInfoX &mseMeasInfo)
    }
 
    gRunDb.timeStamp = gMeasInfo->fStartTime; // should be always defined in raw data
-   //gRunDb.Print();
 
    mseMeasInfo.polarimeter_id = gRunDb.fPolId;
    mysqlpp::DateTime dt(gMeasInfo->fStartTime);
@@ -375,11 +374,8 @@ void RawDataReader::ReadDataPassTwo(MseMeasInfoX &mseMeasInfo)
    while (true) {
 
       if (mSeek > fMem + fMemSize - 1) break;
-      //if (nRecs != 1) break;
-      //printf("Currently consider record: %0#10x, len: %ld\n", (UInt_t) header.type, header.len);
 
       mHeader = (RecordHeaderStruct*) mSeek;
-      //printf("Currently consider record: %0#10x, len: %ld (MEM)\n", (UInt_t) mHeader->type, mHeader->len);
 
       if ((mHeader->type & REC_TYPEMASK) == REC_READAT)
       {
@@ -470,8 +466,6 @@ void DecodeTargetID(const polDataStruct &poldat, MseMeasInfoX &mseMeasInfo)
 {
    cout << endl;
    cout << "target ID = " << poldat.targetIdS << endl;
-   //cout << "startTimeS = " << poldat.startTimeS << endl;
-   //cout << "stopTimeS = " << poldat.stopTimeS << endl;
 
    gRunDb.fFields["TARGET_ID"] = poldat.targetIdS;
 
@@ -500,37 +494,9 @@ void DecodeTargetID(const polDataStruct &poldat, MseMeasInfoX &mseMeasInfo)
       mseMeasInfo.target_orient       = 'H';
    }
 
-   //cout << "target id str: " << str << " " << mseMeasInfo.target_orient << endl;
-
    stringstream sstr;
-   //int target_id;
    sstr << gMeasInfo->fTargetId;
-   //sstr >> target_id;
    sstr >> mseMeasInfo.target_id;
-   //mseMeasInfo.target_id = target_id;
-
-   // Restore Vertical or Horizontal target information
-   // in case this information isn't decorded correctly
-   // within REC_PCTARGET routine. If the target is horizontal,
-   // then mask 90 degree detector.
-   //if (gMeasInfo->fTargetOrient == '-') {
-
-   //   if (str.find("Vert") == 0 || str.find("V") == 0) {
-   //      gMeasInfo->fTargetOrient = 'V';
-   //      mseMeasInfo.target_orient       = 'V';
-   //      tgt.VHtarget            = 0;
-   //   }
-
-   //   if (str.find("Horz") == 0 || str.find("H") == 0) {
-   //      gMeasInfo->fTargetOrient = 'H';
-   //      mseMeasInfo.target_orient       = 'H';
-   //      tgt.VHtarget            = 1;
-   //      // This is too late to reconfigure strip mask because this routine is
-   //      // executed at the end of event loop. Too bad. /* March 5,'09 IN */
-   //      //      mask.detector = 0x2D;
-   //      //      gMeasInfo->ConfigureActiveStrip(mask.detector);
-   //   }
-   //}
 }
 
 static void ProcessRecordLongPassOne(const char *mSeek, RecordHeaderStruct *mHeader)
@@ -763,11 +729,9 @@ void ProcessRecordPCTarget(const pCTargetStruct *rec, MseMeasInfoX &mseMeasInfo)
    }
 
    gAsymRoot->FillTargetHists(gNDelimeters, linRec);
-   //gAsymRoot->AnalyzeTargetMoves();
 
    delete [] linRec;
 
-   //
    tgt.fNDelim = gNDelimeters;
 
    UShort_t i = 0;
@@ -800,19 +764,14 @@ void ProcessRecordPCTarget(const pCTargetStruct *rec, MseMeasInfoX &mseMeasInfo)
               (  tgt.Rotary[k][0] &&  tgt.Rotary[k][1] ) )
          {
             cout << "ERROR: no target rotary info. Don't know H/V target" << endl;
-            //gMeasInfo->fTargetOrient = '-';
          }
 
          if (tgt_identifyV) {
             tgt.VHtarget           = 0;
-            //gMeasInfo->fTargetOrient = 'V';
-            //mseMeasInfo.target_orient      = 'V';
             cout << "Vertical Target in finite position - ???" << endl;
 
          } else if (tgt_identifyH) {
             tgt.VHtarget           = 1;
-            //gMeasInfo->fTargetOrient = 'H';
-            //mseMeasInfo.target_orient      = 'H';
             cout << "Horizontal Target in finite position - ???" << endl;
 
          } else {
@@ -845,7 +804,6 @@ void ProcessRecordPCTarget(const pCTargetStruct *rec, MseMeasInfoX &mseMeasInfo)
                tgt.Rotary[k][0]*gAsymAnaInfo->target_count_mm,
                tgt.Rotary[k][1]*gAsymAnaInfo->target_count_mm);
 
-            //++i;
          }
       }
 
@@ -857,12 +815,6 @@ void ProcessRecordPCTarget(const pCTargetStruct *rec, MseMeasInfoX &mseMeasInfo)
    printf("nTgtIndex: %d\n", nTgtIndex);
 
    tgt.Print();
-
-   // define target histograms (hbook)
-   //tgtHistBook();
-
-   // disable 90 degrees detectors for horizontal target 0x2D={10 1101}
-   //if (tgt.VHtarget) mask.detector = 0x2D;
 }
 
 
@@ -946,13 +898,8 @@ void ProcessRecord(const recordCountRate &rec)
 {
    UInt_t size = (rec.header.len - sizeof(rec.header))/(sizeof(int32_t));
    int32_t *pointer = (int32_t *) rec.data;
-   //Double_t *pointer = (Double_t *) &rec.buffer[sizeof(rec.header)];
 
    cout << "len, size: " << rec.header.len << ", " << size << endl;
-
-   //for (UInt_t i=0; i<size; i++) {
-   //   printf("countrate: i: %d, %ld\n", i, *(pointer+i));
-   //}
 
    gAsymRoot->FillProfileHists(size, pointer);
 }
@@ -983,11 +930,9 @@ void ProcessRecord(const recordWcmAdoStruct &rec)
       if (!data) continue;
 
       gMeasInfo->fWallCurMon[bid] = data;
-      //gMeasInfo->fWallCurMonSum += gMeasInfo->fWallCurMon[bid] * gFillPattern[bid];
       gMeasInfo->fWallCurMonSum += gMeasInfo->fWallCurMon[bid];
    }
 
-   //gMeasInfo->fWallCurMonAve = gMeasInfo->fWallCurMonSum/float(gMeasInfo->NActiveBunch);
    gMeasInfo->fWallCurMonAve = gMeasInfo->fWallCurMonSum / gMeasInfo->fWallCurMon.size();
 
    gAsymRoot->FillRunHists();
@@ -1010,13 +955,6 @@ void ProcessRecord(const RecordWcm &rec)
 /** */
 void ProcessRecord(const recordBeamAdoStruct &rec)
 {
-   //memcpy(&beamdat, &rec.beamado.data, sizeof(beamdat));
-   //beamDataStruct beamdat;
-
-   //gMeasInfo->SetBeamEnergy(beamdat.beamEnergyM);
-   //fprintf(stdout, "Beam Energy: %8.2f\n", gMeasInfo->GetBeamEnergyReal());
-   //fprintf(stdout, "RHIC Beam:   %1d\n", gMeasInfo->fPolBeam);
-
    for (int bid=0; bid<N_BUNCHES; bid++) {
 
       BeamBunchIter  ibb = gMeasInfo->fBeamBunches.find(bid+1);
@@ -1052,23 +990,6 @@ void ProcessRecord(const recordBeamAdoStruct &rec)
       cout << "\nFill pattern has been overwritten" << endl;
       recover.OverwriteFillPattern(Flag.fill_pattern);
    }
-
-   // Mask bad/disabled bunches
-   //if (gMeasInfo->NDisableBunch) {
-   //   cout << "\nFill pattern has been overwritten again" << endl;
-   //   recover.MaskFillPattern();
-   //}
-
-   // Print active Bunch
-   //cout << "\nActive bunches: " << endl;
-
-   //for (int i=0; i<NBUNCH; i++) {
-   //   if (i%10 == 0) cout << " ";
-   //   ActiveBunch[i] = gFillPattern[i];
-   //   cout << ActiveBunch[i];
-   //}
-
-   //cout << endl;
 
    gMeasInfo->PrintBunchPatterns();
 }

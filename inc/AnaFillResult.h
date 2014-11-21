@@ -1,4 +1,3 @@
-
 #ifndef AnaFillResult_h
 #define AnaFillResult_h
 
@@ -57,7 +56,6 @@ public:
    PolId2ValErrMap               fPCPolars;          // (Nominal) intensity weighted polarization measurement results
    PolId2ValErrMap               fPCPolarUnWs;       // The same as fPCPolars but not weighted with intensity
    PolId2TgtOrient2ValErrMap     fPCProfRs;          //!
-   //PolId2TgtOrient2ValErrMap     fPCProfRInjs;       //!
    TargetUId2ValErrMap           fPCPolarsByTargets;
    PolId2ValErrMap               fPCProfPolars;      // Polarization as measured from the sweep measurements P = P_0/sqrt(1 + R)
    RingId2ValErrMap              fHJPolars;
@@ -96,7 +94,6 @@ public:
    time_t GetLumiOffTime() const;
 
    void Print(const Option_t* opt="") const;
-   //void PrintAsPhp(FILE *f=stdout) const;
 
    AnaGlobResult*       GetAnaGlobResult() const { return fAnaGlobResult; }
    void                 SetAnaGlobResult(AnaGlobResult* agr) { fAnaGlobResult = agr; }
@@ -123,7 +120,6 @@ public:
    ValErrPair           GetPCPolarP0(EPolarimeterId polId) const;
    ValErrPair           GetPCPolarSlope(EPolarimeterId polId) const;
    TargetUId            GetPCTarget(EPolarimeterId polId) const { return fPCTargets.find(polId)->second; }
-   //ValErrPair           GetPCPolarPmax(EPolarimeterId polId, ETargetOrient tgtOrient);
    ValErrPair           GetHJPolar(EPolarimeterId polId);
    ValErrPair           GetHJPolar(ERingId ringId) const;
    ValErrPair           GetHJAsym(EPolarimeterId polId);
@@ -143,7 +139,6 @@ public:
    ValErrPair           GetPCProfRSlope(EPolarimeterId polId, ETargetOrient tgtOrient) const;
    ValErrPair           GetPCProfPMax(ERingId ringId, ETargetOrient tgtOrient) const;
    ValErrPair           GetPCProfP(ERingId ringId, ETargetOrient tgtOrient) const;
-   //ValErrPair           GetProfPolarSyst(EPolarimeterId polId);
    void                 CalcBeamPolar(Bool_t doNorm=kFALSE);
    RingId2ValErrMap     CalcPolarRatioU2D(PolId2ValErrMap &normJC);
    PolId2ValErrMap      CalcSystJvsCPolar(PolId2ValErrMap &normJC);
@@ -151,7 +146,6 @@ public:
    ValErrPair           CalcAvrgPolar(EPolarimeterId polId);
    ValErrPair           CalcAvrgPolarUnweighted(EPolarimeterId polId);
    ValErrPair           CalcAvrgPolProfPolar(EPolarimeterId polId);
-   //ValErrPair           CalcAvrgProfRInj(EPolarimeterId polid, ETargetOrient tgtOrient);
    ValErrPair           CalcAvrgProfR(EPolarimeterId polid, ETargetOrient tgtOrient);
    ValErrPair           CalcAvrgPolProfR(ERingId ringId, ETargetOrient tgtOrient);
    ValErrPair           CalcAvrgPolProfPMax(ERingId ringId, ETargetOrient tgtOrient);

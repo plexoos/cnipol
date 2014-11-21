@@ -20,8 +20,6 @@
 #include "DrawObjContainer.h"
 #include "MeasInfo.h"
 
-//class DrawObjContainer;
-
 
 /** */
 class AlphaCalibrator : public Calibrator

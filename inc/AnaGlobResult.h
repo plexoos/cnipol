@@ -69,7 +69,6 @@ public:
    PolId2TgtOrient2ValErrMap  GetAvrgPCProfRUnWs() const { return fAvrgPCProfRUnWs; }
    ValErrPair                 GetAvrgPCProfRUnW(EPolarimeterId polId, ETargetOrient tgtOrient) const { return fAvrgPCProfRUnWs.find(polId)->second.find(tgtOrient)->second; }
    AnaFillResult*             GetAnaFillResult(UInt_t fillId);
-   //ValErrPair                 GetBeamPolarExp(UInt_t fillId, ERingId ringId);
    void                       UpdateInsertDb(AsymDbSql &asymDbSql) const;
    ValErrPair                 GetNormJetCarbon(EPolarimeterId polId);
    ValErrPair                 GetNormProfPolar(EPolarimeterId polId);

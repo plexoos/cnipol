@@ -112,16 +112,13 @@ int main(int argc, char *argv[])
       Float_t profileRatioErr  = gMM->fAnaMeasResult->fProfilePolarR.second;
 
       // the cut on polarization value should be removed
-      //if (polarization > 99 || polarizationErr > 30 ||
       if (polarization < 10 || polarization > 99 || polarizationErr > 30 ||
 	  //  gRunConfig.fBeamEnergies.find(beamEnergy) == gRunConfig.fBeamEnergies.end() ||
           gMM->fMeasInfo->fMeasType != kMEASTYPE_SWEEP ||
           (TMath::Abs(profileRatio) > 5.000) ||                             // exclude very large values
           (TMath::Abs(profileRatio) > 1.000 && profileRatioErr < 0.05) ||   // exclude large values with small errors
           (TMath::Abs(profileRatio) > 1.000 && profileRatioErr > 0.50) ||   // exclude large values with large errors
-          //(profileRatioErr/TMath::Abs(profileRatio) > 2.000 && TMath::Abs(profileRatio) > 1.0) ||
           profileRatioErr < 0.01 || profileRatioErr > 10 ||                 // exclude too small and too big errors. probably from failed fits?
-          //(TMath::Abs(profileRatio) < 0.001 && profileRatioErr < 0.01)
           ( fillId >= 17064 && fillId <= 17084 )
          )
       {

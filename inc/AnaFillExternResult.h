@@ -51,7 +51,6 @@ public:
    time_t        GetLumiOffTime() const { return fTimeEventLumiOff; }
 
    void Print(const Option_t* opt="") const;
-   //void PrintAsPhp(FILE *f=stdout) const;
 
    void Process();
 

@@ -79,7 +79,6 @@ void AnaFillResult::Print(const Option_t* opt) const
 {
    Info("Print", "Print members:");
    printf("Fill %d:\n", fFillId);
-   //PrintAsPhp();
 
    AnaMeasResultMapConstIter iAnaMeasResult = fAnaMeasResults.begin();
 
@@ -250,12 +249,6 @@ std::vector<TGraphErrors*> AnaFillResult::GetBCCurGraphs(EPolarimeterId polId) c
 }
 
 
-///** */
-//void AnaFillResult::PrintAsPhp(FILE *f) const
-//{
-//}
-
-
 /** */
 void AnaFillResult::AddMeasResult(AnaMeasResult &result)
 {
@@ -272,9 +265,6 @@ void AnaFillResult::AddMeasResult(EventConfig &mm)
 
    if (mm.fMeasInfo->fStartTime < fStartTime) fStartTime = mm.fMeasInfo->fStartTime;
    if (mm.fMeasInfo->fStartTime > fEndTime)   fEndTime   = mm.fMeasInfo->fStartTime;
-
-   //Info("AddMeasResult", "fStartTime %d (meas)", mm.fMeasInfo->fStartTime);
-   //Info("AddMeasResult", "fStartTime %d", GetStartTime());
 
    // add or overwrite new AnaFillResult
    fAnaMeasResults[runName] = *mm.fAnaMeasResult;
@@ -306,26 +296,18 @@ void AnaFillResult::AddGraphMeasResult(EventConfig &mm, DrawObjContainer &ocIn)
       asymHists = (CnipolAsymHists*) ocIn.d.find("asym")->second;
    }
 
-   //asymHists->Print();
-
    TH1* hAsymVsBunchId_X90 = (TH1*) asymHists->o["hAsymVsBunchId_X90"];
    TH1* hAsymVsBunchId_X45 = (TH1*) asymHists->o["hAsymVsBunchId_X45"];
    TH1* hAsymVsBunchId_Y45 = (TH1*) asymHists->o["hAsymVsBunchId_Y45"];
 
    string runName = mm.fMeasInfo->GetRunName();
 
-   //Info("AddGraphMeasResult", "current dir");
    // Switch to a new default directory since the input one is deleted when the
    // input file is closed
    gROOT->cd();
-   //gDirectory->Print();
    fAnaMeasResults[runName].fhAsymVsBunchId_X90 = (TH1*) hAsymVsBunchId_X90->Clone();
    fAnaMeasResults[runName].fhAsymVsBunchId_X45 = (TH1*) hAsymVsBunchId_X45->Clone();
    fAnaMeasResults[runName].fhAsymVsBunchId_Y45 = (TH1*) hAsymVsBunchId_Y45->Clone();
-
-   //fAnaMeasResults[runName].fhAsymVsBunchId_X45->Print();
-   //fAnaMeasResults[runName].fhAsymVsBunchId_X45->GetListOfFunctions()->Print();
-   //Info("AddGraphMeasResult", "yyy %p", (void*) fAnaMeasResults[runName].fhAsymVsBunchId_X45 );
 }
 
 
@@ -379,16 +361,12 @@ void AnaFillResult::Process(DrawObjContainer *ocOut)
       if (measInfo.GetBeamEnergy() > fFlattopEnergy)
          fFlattopEnergy = measInfo.GetBeamEnergy();
 
-      //Info("Process", "xxx1");
       // Proceed only with flattop measurements
       if ( !IsValidFlattopMeas(measInfo) ) continue;
 
-      //Info("Process", "zzz %p", (void*) iAnaMeasResult->second.fhAsymVsBunchId_X45);
-      //iAnaMeasResult->second.fhAsymVsBunchId_X45->Print();
       if ((fAnaFillExternResult.GetGrBluIntens()->GetN() != 0)
        && (fAnaFillExternResult.GetGrYelIntens()->GetN() != 0))
       {
-         //fFlattopEnergy = measInfo.GetBeamEnergy();
          fFillType = kFILLTYPE_PHYSICS;
       }
 
@@ -427,9 +405,7 @@ void AnaFillResult::Process(DrawObjContainer *ocOut)
       {
          ETargetOrient tgtOrient = *iTgtOrient;
 
-         //fPCProfRInjs[polId][tgtOrient] = CalcAvrgProfRInj(polId, tgtOrient);
          fPCProfRs[polId][tgtOrient]    = CalcAvrgProfR(polId, tgtOrient);
-         //printf("fPCProfRs: %f,  %f\n", fPCProfRs[polId][tgtOrient].first, fPCProfRs[polId][tgtOrient].second);
       }
 
 
@@ -468,10 +444,6 @@ void AnaFillResult::Process(DrawObjContainer *ocOut)
 Bool_t AnaFillResult::IsValidFlattopMeas(const MeasInfo &measInfo)
 {
    if (measInfo.GetBeamEnergy() == kINJECTION) return kFALSE;
-
-   //if (!fAnaFillExternResult) return kFALSE;
-
-   //if (measInfo.fStartTime-fStartTime < lumion || measInfo.fStartTime-fStartTime > lumioff) return kFALSE;
 
    return kTRUE;
 }
@@ -660,24 +632,6 @@ ValErrPair AnaFillResult::GetPCProfRSlope(EPolarimeterId polId, ETargetOrient tg
 
    return result;
 }
-
-
-/** */
-//ValErrPair AnaFillResult::GetPCPolarPmax(EPolarimeterId polId, ETargetOrient tgtOrient)
-//{
-//   ValErrPair result(0, -1);
-//
-//   TGraphErrors *gr = GetPCProfRGraph(polId, tgtOrient);
-//   if (!gr) return result;
-//
-//   TF1* func = gr->GetFunction("fitFunc");
-//   if (!func) return result;
-//
-//   result.first  = func->GetParameter(0);
-//   result.second = func->GetParError(0);
-//
-//   return result;
-//}
 
 
 /** */
@@ -884,14 +838,6 @@ PolId2ValErrMap AnaFillResult::CalcSystProfPolar(PolId2ValErrMap &normPP)
       ValErrPair ratio = utils::CalcDivision(polarPP, polarPC, 1);
 
       fSystProfPolar[polId] = ratio;
-
-      //Double_t re_polarPC = polarPC.second/polarPC.first;
-      //Double_t re_polarPP = polarPP.second/polarPP.first;
-      //Double_t re_polar_syst = (ratio.first - 1)*(ratio.first - 1)/ratio.first/ratio.first -
-      //                         re_polarPC*re_polarPC - re_polarPP*re_polarPP + 2*re_polarPC*re_polarPP; // assume 100% correlation
-      //Double_t syst = 0;
-      //if (re_polar_syst >= 0) syst = sqrt(re_polar_syst);// * polarPC.first;
-      //fSystProfPolar[polId] = ValErrPair(syst, syst); // error does not really mean anything
    }
 
    return fSystProfPolar;
@@ -996,7 +942,6 @@ ValErrPair AnaFillResult::CalcAvrgPolar(EPolarimeterId polId)
       return avrgPol;
    } else {
       Warning("CalcAvrgPolar", "Fill %d. Graph defined for polId %d", fFillId, polId);
-      //grPCPolar->Print();
    }
 
    // Check that graph has fit func
@@ -1129,7 +1074,6 @@ ValErrPair AnaFillResult::CalcAvrgProfR(EPolarimeterId polId, ETargetOrient tgtO
       return avrgProfR;
    } else {
       Info("CalcAvrgProfR", "Found profile graph for polId %d, tgtOrient %d", polId, tgtOrient);
-      //grPCProfR->Print();
    }
 
    // Loop over all data points
@@ -1148,8 +1092,6 @@ ValErrPair AnaFillResult::CalcAvrgProfR(EPolarimeterId polId, ETargetOrient tgtO
       ValErrPair profRVE(profR, profRErr);
 
       avrgProfR = utils::CalcWeightedAvrgErr(avrgProfR, profRVE);
-
-      //printf("v, e: %f, %f, %f, %f\n", profR, profRErr, avrgProfR.first, avrgProfR.second);
    }
 
    return avrgProfR;
@@ -1236,9 +1178,6 @@ ValErrPair AnaFillResult::CalcPolProfP(ValErrPair R, ValErrPair PMax)
 
    polProfP.first = PMax.first / sqrt(1 + R.first);
 
-   //relDelta2 = PMax.second * PMax.second / PMax.first / PMax.first + R.second * R.second / R.first / R.first;
-   //polProfP.second = polProfP.first * sqrt(relDelta2);
-
    Double_t delta2 = PMax.first * PMax.first * R.second *
                      R.second/4./(1+R.first)/(1+R.first)/(1+R.first) +
                      PMax.second * PMax.second / (1 + R.first);
@@ -1259,7 +1198,6 @@ void AnaFillResult::CalcRotatorPCPolarRatio()
    for ( ; iPolId2MeasInfoPtrSet != fMeasInfosByPolId.end(); ++iPolId2MeasInfoPtrSet)
    {
       EPolarimeterId  polId           = iPolId2MeasInfoPtrSet->first;
-      //cout << "polId: " << RunConfig::AsString(polId) << endl;
       const MeasInfoPtrSet &measInfos = iPolId2MeasInfoPtrSet->second;
 
       // Now loop over all measInfos for this polarimeter and select the first
@@ -1273,8 +1211,6 @@ void AnaFillResult::CalcRotatorPCPolarRatio()
       for ( ; iMeasInfoPtr != measInfos.end(); ++iMeasInfoPtr)
       {
          const MeasInfo &measInfo = **iMeasInfoPtr;
-         //cout << "runName: " << measInfo.GetRunName() << ", IsStarRotatorOn: " << measInfo.IsStarRotatorOn()<< endl;
-         //cout << "runName: " << measInfo.GetRunName() << ", IsStarRotatorOn: " << measInfo.IsStarRotatorOn()<< endl;
 
          if (measInfo.GetBeamEnergy() <= kINJECTION) continue;
 
@@ -1282,7 +1218,6 @@ void AnaFillResult::CalcRotatorPCPolarRatio()
          {
             polarBeforeRot = fAnaMeasResults[measInfo.GetRunName()].GetPCPolar();
             timeBeforeRot  = measInfo.GetStartTime();
-            //cout << "polarBeforeRot: " << PairAsPhpArray(polarBeforeRot) << endl;
             continue;
          }
 
@@ -1290,15 +1225,10 @@ void AnaFillResult::CalcRotatorPCPolarRatio()
          if (measInfo.IsStarRotatorOn() && polarBeforeRot.second > 0 && fabs(measInfo.GetStartTime() - timeBeforeRot) < 3600)
          {
             polarAfterRot = fAnaMeasResults[measInfo.GetRunName()].GetPCPolar();
-            //cout << "polarAfterRot : " << PairAsPhpArray(polarAfterRot) << endl;
          }
       }
 
       fRotatorPCPolarRatio[polId] = utils::CalcDivision(polarAfterRot, polarBeforeRot, 0);
-
-      //cout << "polarBeforeRot: " << PairAsPhpArray(polarBeforeRot) << endl;
-      //cout << "polarAfterRot : " << PairAsPhpArray(polarAfterRot) << endl;
-      //cout << "fRotatorPCPolarRatio : " << PairAsPhpArray(fRotatorPCPolarRatio[polId]) << endl;
    }
 }
 
@@ -1328,10 +1258,6 @@ void AnaFillResult::CalcRampPCPolarRatio()
       ValErrPair pcPolarP0 = GetPCPolarP0(polId);
 
       fRampPCPolarRatio[polId] = utils::CalcDivision(pcPolarP0, pcPolarInj, 0);
-
-      //cout << "pcPolarP0:         " << PairAsPhpArray(pcPolarP0) << endl;
-      //cout << "pcPolarInj :       " << PairAsPhpArray(pcPolarInj) << endl;
-      //cout << "fRampPCPolarRatio: " << PairAsPhpArray(fRampPCPolarRatio[polId]) << endl;
    }
 }
 
@@ -1355,7 +1281,6 @@ void AnaFillResult::CalcAvrgAsymByBunch(const AnaMeasResult &amr, const MeasInfo
    ssFillId << fFillId;
    string sFillId = ssFillId.str();
 
-   //MAsymSingleFillHists *singleFillHists = (MAsymSingleFillHists*) fillHists->GetSingleFillHists(fFillId);
    MAsymSingleFillHists *singleFillHists = (MAsymSingleFillHists*) fillHists->GetSingleFillHists(*this);
 
    TH1* hAsymVsBunchId_X_  = (TH1*) singleFillHists->o["hAsymVsBunchId_X_" + sFillId + "_" + sRingId];
@@ -1383,10 +1308,6 @@ void AnaFillResult::CalcAvrgAsymByBunch(const AnaMeasResult &amr, const MeasInfo
 
       utils::MergeGraphs(grAsymVsBunchId_X_fill, grAsymVsBunchId_X90);
    }
-
-   //TGraphErrors *grAsymVsBunchId_X90 = new TGraphErrors(0);
-   //utils::MergeGraphs(grAsymVsBunchId_X90, hAsymVsBunchId_X90->GetListOfFunctions());
-   //utils::BinGraph(grAsymVsBunchId_X90, hAsymVsBunchId_X90_fill);
 }
 
 
@@ -1466,10 +1387,8 @@ void AnaFillResult::FitExternGraphs()
 
       if (grIntens->GetN() == 0) continue;
 
-      //if ( fabs(lumioff - lumion) < 3600 ) continue;
 
       stringstream ssFormula("");
-      //ssFormula << "[0] * 1./exp((x - " << lumion << ")/3600./[1])";
       ssFormula << "[0] * (1.- (x - " << lumion << ")/3600./[1])";
 
       TF1 fitFunc("fitFunc", ssFormula.str().c_str());
@@ -1528,8 +1447,6 @@ void AnaFillResult::FitPCPolarGraphs()
 
       grPCPolar->Apply(dummyScale);
 
-      //Info("FitPCPolarGraphs", "Using range %d - %d", GetLumiOnRelTime(), GetLumiOffRelTime());
-
       stringstream ssFormula("");
       ssFormula << "[0] + [1]*(x - (" << GetLumiOnRelTime() << ") )/3600.";
 
@@ -1567,7 +1484,6 @@ void AnaFillResult::FitPCPolarGraphs()
       Info("FitPCPolarGraphs", "Fill %d. Fitting flattop graph for polId %d", fFillId, polId);
 
       grPCPolar->Fit(fitFunc, "", "", xmin, xmax);
-      //grPCPolar->GetFunction("fitFunc")->Print();
 
       delete fitFunc;
    }
@@ -1613,7 +1529,6 @@ void AnaFillResult::FitPCProfRGraphs()
          if (!grPCProfR) continue;
 
          Double_t xmin, ymin, xmax, ymax;
-         //grPCProfR->ComputeRange(xmin, ymin, xmax, ymax);
          
          TGraph *tmpGraph = utils::SubGraph(grPCProfR, GetLumiOnRelTime(), GetLumiOffRelTime());
          tmpGraph->ComputeRange(xmin, ymin, xmax, ymax);

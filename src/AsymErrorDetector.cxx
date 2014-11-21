@@ -307,14 +307,6 @@ void StripAnomalyDetector()
             DrawText(mass_e_correlation_strip, float(i+1), strpchk.ecorr.p[1][i], 2, text);
          }
  
-         /* Currently chi2 is poor. Follwing routine is disabled until chi2 is inproved
-         // chi2 of Gaussian fit on Inv. Mass peak
-         if (feedback.chi2[i] > strpchk.chi2.allowance) {
-         strip_err_code += 4;
-         printf(" WARNING: strip # %d chi2 of Gaussian fit on mass %8.4f exeeds allowance limit %8.4f\n",
-         i+1, feedback.chi2[i], strpchk.chi2.allowance);
-         }*/
- 
          if (strip_err_code) {
             gAnaMeasResult->anomaly.st[gAnaMeasResult->anomaly.nstrip]=i;
             ++gAnaMeasResult->anomaly.nstrip;
@@ -324,11 +316,6 @@ void StripAnomalyDetector()
          gAnaMeasResult->anomaly.strip_err_code = gAnaMeasResult->anomaly.strip_err_code | strip_err_code ;
       }
    }
- 
-   // register unrecognized anomaly strips
-   //UnrecognizedAnomaly(gAnaMeasResult->anomaly.st, gAnaMeasResult->anomaly.nstrip,
-   //   &gMeasInfo->fDisabledChannels[0], gMeasInfo->GetNumDisabledChannels(),
-   //   gAnaMeasResult->unrecog.anomaly.st, gAnaMeasResult->unrecog.anomaly.nstrip);
 }
 
 
@@ -665,48 +652,3 @@ void UnrecognizedAnomaly(int x[], int nx, int y[], int ny, int z[], int &nz)
       if (match[i]!=-1) { z[nz] = match[i]; nz++;}
    }
 }
-
-
-/*
-// Description : check for bad bunches
-void checkForBadBunches()
-{
-   // counter initiariztion
-   gAnaMeasResult->anomaly.nbunch=0;
-   bnchchk.rate.allowance=errdet.BUNCH_RATE_SIGMA_ALLOWANCE;
- 
-   printf("checking for bad bunches\n");
- 
-   double avg;
-   double sigma;
-   for(int i=0;i<N_DETECTORS;i++)
-   {
-      avg=0.;
-      for(int j=0;j<120;j++)
-      {
-         avg+=Ncounts[i][j];
-      }
-      avg=avg/120.;
- 
-      sigma=0.;
-      for(int j=0;j<120;j++)
-      {
-         sigma+=((Ncounts[i][j]-avg)*(Ncounts[i][j]-avg));
-      }
-      sigma=sigma/120.;
-      sigma=sqrt(sigma);
- 
-      for(int j=0; j<120; j++) {
-         if((Ncounts[i][j]-avg)> bnchchk.rate.allowance*sigma)
-         {
-            gAnaMeasResult->anomaly.bunch[gAnaMeasResult->anomaly.nbunch]=j+1;
-            gAnaMeasResult->anomaly.nbunch++;
-            printf("WARNING: bunch # %d has very many counts in detector # %d\n", j+1, i+1);
-         }
-      }
-   }
- 
-   UnrecognizedAnomaly(gAnaMeasResult->anomaly.bunch,gAnaMeasResult->anomaly.nbunch,gMeasInfo->DisableBunch,gMeasInfo->NDisableBunch,
-                       gAnaMeasResult->unrecog.anomaly.bunch, gAnaMeasResult->unrecog.anomaly.nbunch);
-}
-*/

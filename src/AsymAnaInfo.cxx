@@ -95,8 +95,6 @@ string AsymAnaInfo::GetRootTreeFileName(UShort_t trid) const
 /** */
 void AsymAnaInfo::ProcessOptions(int argc, char **argv)
 {
-   //extern char *optarg;
-
    int          option_index = 0;
    char         cfile[32];
 

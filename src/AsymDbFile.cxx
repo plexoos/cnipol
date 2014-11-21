@@ -1,4 +1,3 @@
-
 #include "AsymDbFile.h"
 
 #include "TObjArray.h"
@@ -75,7 +74,6 @@ DbEntry* AsymDbFile::Select(std::string runName)
    }
 
    char    *line   = NULL;
-   //UInt_t   iLine  = 1;
    size_t   len    = 0;
    ssize_t  nBytes = 0;
    DbEntry *currentRun = 0;
@@ -85,11 +83,7 @@ DbEntry* AsymDbFile::Select(std::string runName)
       ssize_t nb = getline(&line, &len, fDbFile);
       nBytes += nb;
 
-      // if reached the end of file
-      //if (nb < 0) { if (!currentRun) return 0; }
-
       string sline(line);
-      //cout << setw(8) << iLine++ << " (" << setw(8) << nb << "): " << sline;
 
       // Skip blank and comment lines
       if ( TPRegexp("^(\\s*)//(.*)$").MatchB(sline) )// ||
@@ -99,10 +93,7 @@ DbEntry* AsymDbFile::Select(std::string runName)
       if (TPRegexp("\\[([\\w,\\W]+)\\]").MatchB(sline) || nb < 0) {
 
          if (currentRun) {
-            //currentRun->UpdateValues();
             UpdateCommonFields(*currentRun);
-            //PrintCommon();
-            //printf("--- %s, %s\n", runName.c_str(), currentRun->fRunName.c_str());
 
             if (currentRun->fRunName == runName) {
                printf("Found run %s\n", runName.c_str());
@@ -135,8 +126,6 @@ DbEntry* AsymDbFile::Select(std::string runName)
          TObjArray *subStrL = TPRegexp("\\[([\\w,\\W]+)\\]").MatchS(sline);
          TString subStr = ((TObjString *) subStrL->At(1))->GetString();
          delete subStrL;
-
-         //printf("XXX found %s\n", subStr.Data());
 
          currentRun = new DbEntry();
          currentRun->fRunName = subStr;
@@ -177,7 +166,6 @@ void AsymDbFile::Delete(std::string runName)
       nBytes += nb;
 
       string sline(line);
-      //cout << "line: " << sline;
 
       TObjArray *subStrL = TPRegexp("\\[([\\w,\\W]+)\\]").MatchS(sline);
 
@@ -191,7 +179,6 @@ void AsymDbFile::Delete(std::string runName)
       delete subStrL;
 
       if (subStr == runName) {
-         //printf("XXX found %s\n", runName.c_str());
          skipLine = true;
       } else
          skipLine = false;
@@ -202,10 +189,7 @@ void AsymDbFile::Delete(std::string runName)
    newDbFile.close();
    fclose(fDbFile);
 
-   //remove(fDbFileName.c_str());
-
    int errcode = rename(newDbFileName.c_str(), fDbFileName.c_str());
-   //printf("outfile %s\n", fDbFileName.c_str());
 
    if (errcode == 0)
       printf("DB file was updated\n");
@@ -237,11 +221,9 @@ void AsymDbFile::Dump()
    for (ir=br; ir!=er; ir++) {
       if (fCommonRunDB[ir->fPolId]) {
          DropCommonFields((DbEntry*) &*ir);
-         //printf("Dropping common fields from %s, %d\n", ir->fRunName.c_str(), ir->fPolId);
       }
 
       ir->PrintAsDbEntry(dbFile);
-      //fCommonRunDB->UpdateFields(ir);
       UpdateCommonFields((DbEntry&) *ir);
    }
 
@@ -285,12 +267,8 @@ void AsymDbFile::Insert(DbEntry *dbrun)
    DbRunSet::iterator irun = fDBRuns.find(*dbrun);
 
    if (irun != fDBRuns.end()) { // element exists
-      //printf("Updating run %s in database\n", dbrun->fRunName.c_str());
       fDBRuns.erase(irun);
    }
-   //else { // element does not exist
-   //   printf("XXX dbrun %s not found\n", dbrun->fRunName.c_str());
-   //}
 
    printf("Inserting run \"%s\" in database\n", dbrun->fRunName.c_str());
    fDBRuns.insert(*dbrun);
@@ -325,10 +303,6 @@ void AsymDbFile::UpdateCommonFields(DbEntry &dbrun)
       dbrun.timeStamp = atoi(dbrun.fFields["START_TIME"].c_str());
    }
 
-   //if (dbrun.fPolId == UCHAR_MAX)
-
-   //printf("polId: %d\n", dbrun.fPolId);
-
    if (!fCommonRunDB[dbrun.fPolId]) {
       DbEntry *cr = new DbEntry();
 
@@ -361,7 +335,6 @@ void AsymDbFile::DropCommonFields(DbEntry *dbrun)
       string &common_field_value = cr->fFields[field_name];
 
       bool isPrivate = dbrun->fFieldFlags[field_name];
-      //bool flag_to   = fFieldFlags[field_name];
 
       if (!isPrivate && field_value != "none" &&
            field_value == common_field_value)
@@ -412,7 +385,6 @@ void readdb(double RUNID)
    while ((read = getline(&line, &len, in_file)) != -1) {
 
       string str(line);
-      //cout << str;
 
       if (str[0] == '[') { // Get Run Number
 
@@ -425,12 +397,9 @@ void readdb(double RUNID)
         }
 
         gRunDb.RunID = strtod(s.c_str(),NULL);
-        //      printf("AsymDbFile: %.3f\n",gRunDb.RunID);
         match = MatchPolarimetry(RUNID, gRunDb.RunID);
 
         if (match){
-           //currRun.RunID = gRunDb.RunID;
-
            if (RUNID<gRunDb.RunID) break;
         }
 
@@ -474,13 +443,6 @@ void readdb(double RUNID)
       }
    }
 
-   // Find Disable Strip List
-   //gMeasInfo->NDisableStrip = FindDisableStrip();
-
-   // Find Disable Bunch List
-   //gMeasInfo->NDisableBunch = FindDisableBunch();
-   //if (gMeasInfo->NDisableBunch) Flag.mask_bunch = 1;
-
    // processing conditions
    if (!extinput.CONFIG){
      strcat(reConfFile, gRunDb.config_file_s.c_str());
@@ -492,7 +454,6 @@ void readdb(double RUNID)
    if ( calibdir == NULL ){
       cerr << "environment CALIBDIR is not defined" << endl;
       cerr << "e.g. export CALIBDIR=/usr/local/cnipol/calib" << endl;
-      //exit(-1);
       strcpy(calibdir, ".");
    }
 
@@ -506,10 +467,6 @@ void readdb(double RUNID)
 
    // TSHIFT will be cumulated TSHIFT from run.db and -t option
    gAsymAnaInfo->tshift  += strtof(gRunDb.tshift_s.c_str(),NULL);
-
-   // TSHIFT for injection with respect to flattop timing
-   // removed in favour of fExpectedGlobalTimeOffset in MeasInfo
-   //gAsymAnaInfo->inj_tshift = strtof(gRunDb.inj_tshift_s.c_str(),NULL);
 
    // Expected universal rate for given target
    gAsymAnaInfo->reference_rate = strtof(gRunDb.reference_rate_s.c_str(),NULL);
@@ -576,17 +533,11 @@ void SetDefault()
    // initialize strip arrays
    for (int i=0; i<NSTRIP; i++) {
       ProcessStrip[i]          = 0;
-      //gMeasInfo->ActiveStrip[i]  = 1;
-      //gMeasInfo->fDisabledChannels[i] = 0;
-      //gMeasInfo->NActiveStrip    = NSTRIP;
-      //gMeasInfo->NDisableStrip   = 0;
    }
  
    // initialize bunch arrays
    for (int i=0; i<NBUNCH; i++) {
       ProcessBunch[i]          = 0;
-      //gMeasInfo->DisableBunch[i] = 0;
-      //gMeasInfo->NDisableBunch   = 0;
    }
 }
 
@@ -600,7 +551,6 @@ int FindDisableStrip()
    int NDisableStrip=0;
    for (int i=0;i<NSTRIP; i++) {
       if (ProcessStrip[i]>0) {
-         //gMeasInfo->fDisabledChannels[NDisableStrip] = i;
          NDisableStrip++;
       }
    }
@@ -630,7 +580,6 @@ int FindDisableBunch()
   int NDisableBunch=0;
   for (int i=0;i<NBUNCH; i++) {
     if (ProcessBunch[i]>0) {
-      //gMeasInfo->DisableBunch[NDisableBunch] = i;
       NDisableBunch++;
     }
   }
@@ -723,16 +672,3 @@ string GetVariables(string str)
 
   return str.substr(begin,length);
 }
-
-
-/*
-float GetVariablesFloat(string str)
-{
-  string::size_type begin = str.find("=")+ 1;
-  string::size_type end = str.find(";");
-  string::size_type length = end - begin ;
-
-  string s = str.substr(begin,length);
-  return strtof(s.c_str(),NULL);
-}
-*/

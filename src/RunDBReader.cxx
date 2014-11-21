@@ -58,19 +58,11 @@ int main(int argc, char *argv[])
    //AsymDb *asymDb = new AsymDbSql();
 
    //asymDb->Select();
-
-
    //asymDb->Insert(dbEntry);
 
    return 0;
 
-   //extern DbEntry rundb;
-   //recordConfigRhicStruct  *cfginfo;
-   //extern int gMeasInfo->PrintConfig(recordConfigRhicStruct *);
-
    char * RunID;
-   //char * confdir = getenv("CONFDIR");
-
    int opt;
 
    while (EOF != (opt = getopt(argc, argv, "f:hx?"))) {
