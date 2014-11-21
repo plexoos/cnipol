@@ -32,6 +32,7 @@ public:
 public:
 
    ChannelData();
+   ChannelData(UChar_t ampltd, UChar_t intgrl, UChar_t tdc, UChar_t tdcMax);
    ~ChannelData();
 
    virtual void Print(const Option_t* opt="") const;

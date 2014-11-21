@@ -16,6 +16,12 @@ ChannelEventId::~ChannelEventId()
 };
 
 
+ChannelEventId::ChannelEventId(UInt_t revId, UChar_t bunchId, UChar_t chanId, UChar_t delim) : TObject(),
+   fRevolutionId(revId), fBunchId(bunchId), fChannelId(chanId), fDelimiterId(delim)
+{
+}
+
+
 /** */
 void ChannelEventId::Print(const Option_t* opt) const
 {

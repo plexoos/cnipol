@@ -16,6 +16,12 @@ ChannelData::~ChannelData()
 }
 
 
+ChannelData::ChannelData(UChar_t ampltd, UChar_t intgrl, UChar_t tdc, UChar_t tdcMax) : TObject(),
+   fAmpltd(ampltd), fIntgrl(intgrl), fTdc(tdc), fTdcAMax(tdcMax)
+{
+}
+
+
 /** */
 void ChannelData::Print(const Option_t* opt) const
 {

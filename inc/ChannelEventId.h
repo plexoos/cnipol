@@ -20,6 +20,7 @@ public:
 public:
 
    ChannelEventId();
+   ChannelEventId(UInt_t revId, UChar_t bunchId, UChar_t chanId, UChar_t delim);
    ~ChannelEventId();
 
    virtual void Print(const Option_t* opt="") const;
