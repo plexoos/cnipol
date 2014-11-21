@@ -221,7 +221,7 @@ void CnipolAlphaHists::BookHists()
 void CnipolAlphaHists::FillPassOne(ChannelEvent *ch)
 {
    UChar_t      chId = ch->GetChannelId();
-   ChannelData &data = ch->fChannel;
+   const ChannelData &data = ch->GetChannelData();
 
    string sSi("  ");
    sprintf(&sSi[0], "%02d", chId);

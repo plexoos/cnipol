@@ -132,10 +132,10 @@ void MAsymRateHists::Fill(const EventConfig &rc)
    //Float_t  profileRatio     = rc.fAnaMeasResult->fIntensPolarR;
    //Float_t  profileRatioErr  = rc.fAnaMeasResult->fIntensPolarRErr;
    Float_t  max_rate         = rc.fAnaMeasResult->max_rate;
-   Float_t  tzero            = rc.fCalibrator->fChannelCalibs[0].fT0Coef;
-   Float_t  tzeroErr         = rc.fCalibrator->fChannelCalibs[0].fT0CoefErr;
-   Float_t  dl               = rc.fCalibrator->fChannelCalibs[0].fDLWidth;
-   Float_t  dlErr            = rc.fCalibrator->fChannelCalibs[0].fDLWidthErr;
+   Float_t  tzero            = rc.fCalibrator->GetChannelCalib(0).fT0Coef;
+   Float_t  tzeroErr         = rc.fCalibrator->GetChannelCalib(0).fT0CoefErr;
+   Float_t  dl               = rc.fCalibrator->GetChannelCalib(0).fDLWidth;
+   Float_t  dlErr            = rc.fCalibrator->GetChannelCalib(0).fDLWidthErr;
 
    // XXX
    //if (polId == 3 && dl < 45) cout << "XXX DL: " << dl << endl;

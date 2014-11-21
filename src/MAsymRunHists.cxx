@@ -988,8 +988,8 @@ void MAsymRunHists::Fill(const EventConfig &rc)
       DrawObjContainer *oc_ch = oc_pol->d.find("channel" + sChId)->second;
 
       // T0
-      t0    = rc.fCalibrator->fChannelCalibs[iCh].fT0Coef;
-      t0Err = rc.fCalibrator->fChannelCalibs[iCh].fT0CoefErr;
+      t0    = rc.fCalibrator->GetChannelCalib(iCh).fT0Coef;
+      t0Err = rc.fCalibrator->GetChannelCalib(iCh).fT0CoefErr;
 
       // XXX also should be removed when real QA is available
       if (isnan(t0) || isinf(t0) || isnan(t0Err) || isinf(t0Err)) continue;
@@ -1004,8 +1004,8 @@ void MAsymRunHists::Fill(const EventConfig &rc)
       ((TH1*) oc_ch->o[shName]) -> Fill(t0);
 
       // DL
-      dl    = rc.fCalibrator->fChannelCalibs[iCh].fDLWidth;
-      dlErr = rc.fCalibrator->fChannelCalibs[iCh].fDLWidthErr;
+      dl    = rc.fCalibrator->GetChannelCalib(iCh).fDLWidth;
+      dlErr = rc.fCalibrator->GetChannelCalib(iCh).fDLWidthErr;
 
       sprintf(hName, "hDLVsMeas_%s_%s_%02d", sPolId.c_str(), sBeamE.c_str(), iCh);
       graphErrs = (TGraphErrors*) ((TH1*) oc_ch->o[hName])->GetListOfFunctions()->FindObject("grDLVsMeas");

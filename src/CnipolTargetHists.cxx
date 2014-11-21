@@ -110,16 +110,16 @@ void CnipolTargetHists::Fill(ChannelEvent *ch)
 
    switch (chIndex) {
    case 1:
-      ((TH1*) o["hTargetChanVertYel"])->Fill(ch->fChannel.fAmpltd);
+      ((TH1*) o["hTargetChanVertYel"])->Fill(ch->GetAmpltd());
       break;
    case 2:
-      ((TH1*) o["hTargetChanHorzYel"])->Fill(ch->fChannel.fAmpltd);
+      ((TH1*) o["hTargetChanHorzYel"])->Fill(ch->GetAmpltd());
       break;
    case 3:
-      ((TH1*) o["hTargetChanVertBlu"])->Fill(ch->fChannel.fAmpltd);
+      ((TH1*) o["hTargetChanVertBlu"])->Fill(ch->GetAmpltd());
       break;
    case 4:
-      ((TH1*) o["hTargetChanHorzBlu"])->Fill(ch->fChannel.fAmpltd);
+      ((TH1*) o["hTargetChanHorzBlu"])->Fill(ch->GetAmpltd());
       break;
    }
 
