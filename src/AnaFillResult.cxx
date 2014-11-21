@@ -443,9 +443,7 @@ void AnaFillResult::Process(DrawObjContainer *ocOut)
 /** */
 Bool_t AnaFillResult::IsValidFlattopMeas(const MeasInfo &measInfo)
 {
-   if (measInfo.GetBeamEnergy() == kINJECTION) return kFALSE;
-
-   return kTRUE;
+   return measInfo.GetBeamEnergy() == kINJECTION ? false : true;
 }
 
 
