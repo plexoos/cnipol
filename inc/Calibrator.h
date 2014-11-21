@@ -22,14 +22,6 @@ class Calibrator : public TObject
 {
 public:
 
-   ChannelCalibMap  fChannelCalibs;
-   ChannelCalib     fMeanChannel;             //< A virtual "channel" to hold the mean values of all real channels
-   ChannelCalib     fMeanOfLogsChannel;
-   Float_t          fRMSBananaChi2Ndf;
-   Float_t          fRMSOfLogsBananaChi2Ndf;
-
-public:
-
    Calibrator();
    ~Calibrator();
 
@@ -57,6 +49,14 @@ public:
    void                   Print(const Option_t* opt="") const;
    virtual void           PrintAsPhp(FILE *f=stdout) const;
    void                   PrintAsConfig(FILE *f=stdout) const;
+
+protected:
+
+   ChannelCalibMap  fChannelCalibs;           ///<
+   ChannelCalib     fMeanChannel;             ///< A virtual "channel" to hold the mean values of all real channels
+   ChannelCalib     fMeanOfLogsChannel;
+   Float_t          fRMSBananaChi2Ndf;
+   Float_t          fRMSOfLogsBananaChi2Ndf;
 
    ClassDef(Calibrator, 2)
 };
