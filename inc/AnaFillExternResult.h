@@ -50,7 +50,6 @@ public:
    time_t        GetLumiOnTime()  const { return fTimeEventLumiOn; }
    time_t        GetLumiOffTime() const { return fTimeEventLumiOff; }
 
-   void Print(const Option_t* opt="") const;
 
    void Process();
 
