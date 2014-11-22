@@ -20,8 +20,7 @@ class AnaFillResult;
 /** */
 class AnaFillExternResult : public TObject
 {
-public:
-  friend class AnaFillResult;
+   friend class AnaFillResult;
 
 protected:
 
@@ -49,9 +48,6 @@ public:
    TGraphErrors* GetGrYelIntens() const;
    time_t        GetLumiOnTime()  const { return fTimeEventLumiOn; }
    time_t        GetLumiOffTime() const { return fTimeEventLumiOff; }
-
-
-   void Process();
 
    ClassDef(AnaFillExternResult, 1)
 };

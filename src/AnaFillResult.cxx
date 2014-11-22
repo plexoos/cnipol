@@ -1,4 +1,3 @@
-
 #include <string>
 #include <climits>
 
@@ -246,12 +245,6 @@ std::vector<TGraphErrors*> AnaFillResult::GetBCCurGraphs(EPolarimeterId polId) c
      return fAnaFillExternResult.fBCCurGraph.at(polId);
 
    return vector<TGraphErrors*>();
-}
-
-
-/** */
-void AnaFillResult::AddMeasResult(AnaMeasResult &result)
-{
 }
 
 

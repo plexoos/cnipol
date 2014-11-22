@@ -108,7 +108,6 @@ public:
    TGraphErrors*        GetRotCurPhenixGraph(ERingId ringId) const;
    TGraphErrors*        GetSnakeCurGraph(ERingId ringId) const;
    std::vector<TGraphErrors*> GetBCCurGraphs(EPolarimeterId polId) const;
-   void                 AddMeasResult(AnaMeasResult &result);
    void                 AddMeasResult(EventConfig &mm);
    void                 AddGraphMeasResult(EventConfig &mm, DrawObjContainer &ocIn);
    void                 Process(DrawObjContainer *ocOut=0);

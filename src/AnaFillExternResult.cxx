@@ -1,4 +1,3 @@
-
 #include <string>
 #include <climits>
 
@@ -112,11 +111,4 @@ void AnaFillExternResult::LoadInfo(UInt_t fillId)
       TGraphErrors *gr = MakeGraph(values);
       fBCCurGraph[polId].push_back(gr);
    }
-}
-
-
-/** */
-void AnaFillExternResult::Process()
-{
-   //Info("Process", "Executing...");
 }
