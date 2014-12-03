@@ -2,7 +2,7 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
 - [Introduction](#introduction)
   - [General remarks](#general-remarks)
@@ -10,7 +10,8 @@
 - [How to run cnipol](#how-to-run-cnipol)
   - [Batch processing multiple data files](#batch-processing-multiple-data-files)
 - [How to produce summary plots](#how-to-produce-summary-plots)
-- [Other software packages for the RHIC polarimetry](#other-software-packages-for-the-rhic-polarimetry)
+- [Other polarimetry software packages](#other-polarimetry-software-packages)
+- [vim: set noexpandtab:](#vim-set-noexpandtab)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -22,8 +23,8 @@ Relativistic Heavy Ion Collider (RHIC) polarimeters at the Brookhaven National
 Lab (BNL). The first objective of this package is usually referred to as the
 "online" layer and designed to support the data acquisition and to provide
 a quick feedback by carrying out a fast online analysis. The second objective is to
-execute a more rigorous "offline" data analysis and present the results in
-a systematic way. It is normally referred to as the "offline" layer of
+execute a more rigorous offline data analysis and present the results in
+a systematic way. It is normally referred to as the "offline" part of
 **cnipol**.
 
 There is a wiki page with some details about the RHIC polarimetry:
@@ -38,7 +39,7 @@ http://www.phy.bnl.gov/cnipol/
 General remarks
 ---------------
 
-The code for the analysis of the RHIC polarimeters data has changed
+The code to analyse the data from the RHIC polarimeters has changed
 significantly starting 2010. Nevertheless, one may still find it useful to look
 through the older documentation which can be found at
 
@@ -79,7 +80,7 @@ number, e.g. `run_id = 9|11|12|13|15|17`, execute in the terminal (Note: You nee
     source script/setup.sh [run_id]
 
 Once the environment variables are set the cnipol package can be built in
-$CNIPOL_DIR as:
+`$CNIPOL_DIR` as:
 
     mkdir build
     cd build
@@ -115,7 +116,8 @@ with a predefined set of histograms, a log file (stdoe.log) with the entire
 output of the program, a PHP file with information about the measurement and
 results to display on the web, and a file with calibration results.
 
-To analyze an alpha or pulser measurement use the --alpha option:
+To analyze a detector energy response to alpha-particles (a.k.a. alpha
+calibration) or a special test pulse measurement use the `--alpha` option:
 
     asym --alpha -r <meas_id>
 
@@ -145,24 +147,25 @@ measurement to measurement during some period of time. To study such time
 dependence we developed `masym`, a program that runs on a set of measurements
 analyzed with `asym`. The output ROOT files produced by `asym` are used as input
 to `masym`. Executing the following command will create a `<meas_list>` directory
-in $CNIPOL_RESULTS_DIR with a ROOT file containing summary histograms:
+in `$CNIPOL_RESULTS_DIR` with a ROOT file containing summary histograms:
 
     masym -m <meas_list>
 
-Here <meas_list> is a plain text file with a list of measurements to process.
-This file is assumed to exist in $CNIPOL_RESULTS_DIR/runXX/lists/ and to have
+Here `<meas_list>` is a plain text file with a list of measurements to process.
+This file is assumed to exist in `$CNIPOL_RESULTS_DIR/runXX/lists/` and to have
 one `<meas_id>` per line.
 
 Optionally, the analyzer can provide a plain text file
-$CNIPOL_RESULTS_DIR/runXX/hjet_pol with H-Jet polarization values, and one file
-$CNIPOL_RESULTS_DIR/runXX/cdev_info/cdev_NNNNN per fill NNNNN containing
-intensity and other beam parameters. Information from these text files will be
-used by `masym` in the summary plots. Information from CDEV can be extracted
-using the following script on the acnlin CAD cluster:
+`$CNIPOL_RESULTS_DIR/runXX/hjet_pol` with H-Jet polarization values, and one file
+`$CNIPOL_RESULTS_DIR/runXX/cdev_info/cdev_NNNNN` per fill `NNNNN` containing
+intensity and other beam parameters from the CDEV services. Information from
+these text files will be used by `masym` in the summary plots. Information from
+CDEV can be extracted using the following script on any machine in the acnlin
+CAD cluster:
 
     $CNIPOL_DIR/script/get_fill_info.sh <NNNNN>
 
-where <NNNNN> must be replaced with an actual fill number.
+where `<NNNNN>` must be replaced with an actual fill number.
 
 Similarly to `masym` we provide a program to study time dependences in a set of
 alpha-calibration measurements. This program is called `malpha` and can be
