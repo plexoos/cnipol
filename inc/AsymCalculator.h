@@ -64,7 +64,6 @@ public:
    ValErrMap     CalcDetAsymX45BSqrtFormula(TH1 &hUp, TH1 &hDown);
    ValErrMap     CalcDetAsymY45SqrtFormula (TH1 &hUp, TH1 &hDown);
 
-   void          CumulativeAsymmetry();
    // Strip by Strip
    void  CalcStripAsymmetry(DrawObjContainer *oc);
    void  CalcStripAsymmetryByProfile(DrawObjContainer *oc);
@@ -81,6 +80,7 @@ public:
    void ScanSinPhiFit(Float_t p0, Float_t *RawP, Float_t *dRawP,
       Float_t *P, Float_t *phase, Float_t &chi2dof);
  
+   static void       CumulativeAsymmetry(long* nGood, long* nTotal, long* nBack);
    static Float_t    WeightAnalyzingPower(int hid);
    static Bool_t     IsExclusionCandidate(int i, int j);
    static ValErrPair CalcAsym(Double_t A, Double_t B, Double_t totalA, Double_t totalB);
@@ -90,6 +90,7 @@ public:
    static void       PrintWarning();
    static void       PrintRunResults();
    static void       DrawPlotvsTar();
+   static void       SpecificLuminosity(long* nGood);
 };
 
 
@@ -102,6 +103,5 @@ float TshiftFinder(int, int);
 
 // Profile Error
 float ProfileError(float x);
-void  SpecificLuminosity(float&, float&, float&);
 
 #endif

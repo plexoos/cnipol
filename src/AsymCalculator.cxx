@@ -244,9 +244,16 @@ ValErrMap AsymCalculator::CalcDetAsymY45SqrtFormula(TH1 &hUp, TH1 &hDown)
 }
 
 
-// Method name : CumulativeAsymmetry(){
-// Description : Calculate bunch cumulative asymmetries
-void AsymCalculator::CumulativeAsymmetry()
+/**
+ * Calculates bunch cumulative asymmetries.
+ *
+ * \param nGood   number of events after carbon cut (each bunch)
+ * \param nTotal  number of events before carbon cut (each bunch)
+ * \param nBack   number of events below the curbon cut (each bunch)
+ *
+ * The size of the above arrays is assumed to be equal to N_BUNCHES
+ */
+void AsymCalculator::CumulativeAsymmetry(long* nGood, long* nTotal, long* nBack)
 {
    asymStruct x90[N_BUNCHES];  // x90[119] is total
    asymStruct x45[N_BUNCHES];
@@ -327,32 +334,32 @@ void AsymCalculator::CumulativeAsymmetry()
       gbid[bid] = 1;
 
       // good/total event rate
-      if (Ntotal[bid] != 0) {
-         if ( ((float) Ngood[bid]/Ntotal[bid]) < gtmin) {
+      if (nTotal[bid] != 0) {
+         if ( ((float) nGood[bid]/nTotal[bid]) < gtmin) {
             fprintf(stdout,"BID: %d discarded (GOOD/TOTAL) %f \n",
-                    bid, (float) Ngood[bid]/Ntotal[bid]);
+                    bid, (float) nGood[bid]/nTotal[bid]);
             gbid[bid] = 0;
          }
 
-         if ( ((float) Ngood[bid]/Ntotal[bid]) > gtmax){
+         if ( ((float) nGood[bid]/nTotal[bid]) > gtmax){
             fprintf(stdout,"BID: %d discarded (GOOD/TOTAL) %f \n",
-                    bid, (float) Ngood[bid]/Ntotal[bid]);
+                    bid, (float) nGood[bid]/nTotal[bid]);
             gbid[bid] = 0;
          }
       }
 
       // background / carbon event rate
-      if (Ngood[bid]!=0) {
+      if (nGood[bid]!=0) {
 
-         if (((float)Nback[bid]/Ngood[bid]) < btmin){
+         if (((float)nBack[bid]/nGood[bid]) < btmin){
             fprintf(stdout,"BID: %d discarded (BG/GOOD) %f \n",
-                    bid,(float)Nback[bid]/Ngood[bid]);
+                    bid,(float)nBack[bid]/nGood[bid]);
             gbid[bid] = 0;
          }
 
-         if (((float)Nback[bid]/Ngood[bid]) > btmax) {
+         if (((float)nBack[bid]/nGood[bid]) > btmax) {
             fprintf(stdout,"BID: %d discarded (BG/GOOD) %f \n",
-                    bid,(float)Nback[bid]/Ngood[bid]);
+                    bid,(float)nBack[bid]/nGood[bid]);
             gbid[bid] = 0;
          }
       }
@@ -953,11 +960,12 @@ float ProfileError(float x)
 }
 
 
-// Specific Luminosity
-// Description : Handle Specific Luminosity
-// Input       : Histograms 10033, 11033, 10034, 11034
-// Return      : float &mean, float &RMS, float &RMS_norm
-void SpecificLuminosity(float &mean, float &RMS, float &RMS_norm)
+/**
+ * Handle Specific Luminosity.
+ *
+ * \param nGood   number of events after carbon cut (each bunch)
+ */
+void AsymCalculator::SpecificLuminosity(long* nGood)
 {
    float SpeLumi_norm[N_BUNCHES], dSpeLumi_norm[N_BUNCHES];
 
@@ -969,9 +977,9 @@ void SpecificLuminosity(float &mean, float &RMS, float &RMS_norm)
 
       if (gMeasInfo->fWallCurMon.find(bid+1) != gMeasInfo->fWallCurMon.end() )
 
-      SpeLumi.Cnts[bid] = gMeasInfo->fWallCurMon[bid+1] != 0 ? Ngood[bid]/gMeasInfo->fWallCurMon[bid+1] : 0;
+      SpeLumi.Cnts[bid] = gMeasInfo->fWallCurMon[bid+1] != 0 ? nGood[bid]/gMeasInfo->fWallCurMon[bid+1] : 0;
 
-      SpeLumi.dCnts[bid] = sqrt(double(Ngood[bid]));
+      SpeLumi.dCnts[bid] = sqrt(double(nGood[bid]));
 
       ((TH1*) gAsymRoot->fHists->d["run"]->o["specific_luminosity"])->Fill(bid+1, SpeLumi.Cnts[bid]);
 
