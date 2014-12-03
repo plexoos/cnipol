@@ -68,10 +68,6 @@ extern char CalibFile[256];          // Energy calibration file
 
 extern float ramptshift[500]; // ramp timing shift 
 
-extern long int Ngood[N_BUNCHES];   // number of evts after carbon cut 
-extern long int Ntotal[N_BUNCHES];  // number of evts before carbon cut 
-extern long int Nback[N_BUNCHES];   // number of evts below the curbon cut
-
 extern AsymAnaInfo                  *gAsymAnaInfo;
 extern MAsymAnaInfo                 *gMAsymAnaInfo;
 extern MeasInfo                     *gMeasInfo;

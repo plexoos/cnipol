@@ -34,10 +34,6 @@ char    CalibFile[256];             // energy calibration file
 
 float   ramptshift[500];            // ramp timing shift
 
-long    Ngood[120];     // number of events after carbon cut (each bunch)
-long    Ntotal[120];    // number of events before carbon cut (each bunch)
-long    Nback[120];     // number of events below the curbon cut (each bunch)
-
 long   *pointer;
 int     gNDelimeters;
 int     TgtIndex[MAXDELIM];
