@@ -201,7 +201,5 @@ int main(int argc, char *argv[])
    delete gAsymRoot;
    delete gAsymDb;
 
-   gAsymAnaInfo->CopyResults();
-
    return EXIT_SUCCESS;
 }

@@ -18,8 +18,7 @@ class AnaInfo : public TObject
 public:
 
    // Flag options
-   enum Flag   {FLAG_COPY              = 0x10000400,
-                FLAG_READ_FROM_DB      = 0x10000100,
+   enum Flag   {FLAG_READ_FROM_DB      = 0x10000100,
                 FLAG_UPDATE_DB         = 0x10000200, FLAG_NO_UPDATE_DB = 0x90000200,
                 FLAG_USE_DB            = 0x10000300,
                 FLAG_CREATE_THUMBS     = 0x10000800};
@@ -50,7 +49,6 @@ public:
    FILE            *fFileMeasInfo;      //!
    FILE            *fFileStdLog;        //!
    std::string      fFileStdLogName;
-   Bool_t           fFlagCopyResults;
    Bool_t           fFlagUseDb;
    Bool_t           fFlagUpdateDb;
    Bool_t           fFlagCreateThumbs;
@@ -76,7 +74,6 @@ public:
    void                 Print(const Option_t* opt="") const;
    void                 PrintAsPhp(FILE *f=stdout) const;
    virtual void         PrintUsage();
-	virtual void         CopyResults();
    Bool_t               HasGraphBit() const;
 
 protected:
@@ -84,7 +81,7 @@ protected:
    void Init();
    void MakeOutDir();
 
-   ClassDef(AnaInfo, 1)
+   ClassDef(AnaInfo, 2)
 };
 
 #endif

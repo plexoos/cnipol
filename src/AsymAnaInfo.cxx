@@ -106,8 +106,6 @@ void AsymAnaInfo::ProcessOptions(int argc, char **argv)
       {"sfx",                 required_argument,   0,   AnaInfo::OPTION_SUFFIX},
       {"graph",               no_argument,         0,   AnaInfo::MODE_GRAPH},
 
-      {"copy",                no_argument,         0,   AnaInfo::FLAG_COPY},
-      {"copy-results",        no_argument,         0,   AnaInfo::FLAG_COPY},
       {"update-db",           no_argument,         0,   AnaInfo::FLAG_UPDATE_DB},
       {"no-update-db",        no_argument,         0,   AnaInfo::FLAG_NO_UPDATE_DB},
       {"use-db",              no_argument,         0,   AnaInfo::FLAG_USE_DB},
@@ -178,10 +176,6 @@ void AsymAnaInfo::ProcessOptions(int argc, char **argv)
 
       case AnaInfo::FLAG_CREATE_THUMBS:
          fFlagCreateThumbs = kTRUE;
-         break;
-
-      case AnaInfo::FLAG_COPY:
-         fFlagCopyResults = kTRUE;
          break;
 
       case AnaInfo::FLAG_UPDATE_DB:
@@ -428,7 +422,6 @@ void AsymAnaInfo::PrintUsage()
    cout << "     --mode-target, --target          : Fill and save target histograms" << endl;
    cout << "     --mode-full                      : Fill and save all histograms" << endl;
    cout << "     --set-calib-alpha                : Provide a root file with alpha calibrations" << endl;
-   cout << "     --copy                           : Copy results to server (?)" << endl;
    cout << "     --use-db                         : Run info will be retrieved from and saved into database" << endl;
    cout << "     --update-db                      : Update run info in database" << endl;
    cout << "     --disable-det <bitmask>          : Exclude some detectors from the analysis, e.g. \"000100\" excludes detector 3" << endl;

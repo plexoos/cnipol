@@ -28,7 +28,7 @@ AnaInfo::AnaInfo() : TObject(),
    fAnaTimeCpu (0),
    fAsymEnv(),
    fFileMeasInfo(0), fFileStdLog(0),
-   fFileStdLogName("stdoe"), fFlagCopyResults(kFALSE), fFlagUseDb(true),
+   fFileStdLogName("stdoe"), fFlagUseDb(true),
    fFlagUpdateDb(kFALSE),    fFlagCreateThumbs(kFALSE),
    fUserGroup(),
    fAlphaSourceCount(-1)
@@ -190,7 +190,6 @@ void AnaInfo::PrintAsPhp(FILE *f) const
 
    fprintf(f, "$rc['fAsymEnv']                     = %s;\n", ssEnvs.str().c_str());
    fprintf(f, "$rc['fFileStdLogName']              = \"%s\";\n", fFileStdLogName.c_str());
-   fprintf(f, "$rc['fFlagCopyResults']             = %d;\n", fFlagCopyResults);
    fprintf(f, "$rc['fFlagUseDb']                   = %d;\n", fFlagUseDb);
    fprintf(f, "$rc['fFlagUpdateDb']                = %d;\n", fFlagUpdateDb);
    fprintf(f, "$rc['fFlagCreateThumbs']            = %d;\n", fFlagCreateThumbs);
@@ -202,23 +201,6 @@ void AnaInfo::PrintAsPhp(FILE *f) const
 
 
 /** */
-void AnaInfo::CopyResults()
-{
-   if (!fFlagCopyResults) return;
-
-   string cmd = "rsync --stats --exclude=*.root -rlpgoDv " + GetOutDir() + " pc2pc.phy.bnl.gov:/usr/local/polarim/root/";
-   Info("CopyResults", "Copying results...\n%s", cmd.c_str());
-
-   char result[1000];
-   FILE *fp = popen( cmd.c_str(), "r");
-
-   while (fgets(result, sizeof(result), fp) != NULL ) { printf("%s", result); }
-
-   pclose(fp);
-}
-
-
-/** */
 void AnaInfo::PrintUsage()
 {
    cout << endl;
@@ -226,7 +208,6 @@ void AnaInfo::PrintUsage()
    cout << " -h, -?                               : Print this help" << endl;
    cout << " -l, --log=[filename]                 : Optional log file to redirect stdout and stderr" << endl;
    cout << " -g, --graph                          : Save histograms as images" << endl;
-   cout << "     --copy                           : Copy results to server (?)" << endl;
    cout << "     --use-db                         : Run info will be retrieved from and saved into database" << endl;
    cout << "     --update-db                      : Update run info in database" << endl;
    cout << endl;

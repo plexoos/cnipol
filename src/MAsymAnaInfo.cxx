@@ -37,8 +37,6 @@ void MAsymAnaInfo::ProcessOptions(int argc, char **argv)
       {"log",                 optional_argument,   0,   'l'},
       {"sfx",                 required_argument,   0,   AnaInfo::OPTION_SUFFIX},
       {"graph",               no_argument,         0,   AnaInfo::MODE_GRAPH},
-      {"copy",                no_argument,         0,   AnaInfo::FLAG_COPY},
-      {"copy-results",        no_argument,         0,   AnaInfo::FLAG_COPY},
       {"update-db",           no_argument,         0,   AnaInfo::FLAG_UPDATE_DB},
       {"no-update-db",        no_argument,         0,   AnaInfo::FLAG_NO_UPDATE_DB},
       {"use-db",              no_argument,         0,   AnaInfo::FLAG_USE_DB},
@@ -78,10 +76,6 @@ void MAsymAnaInfo::ProcessOptions(int argc, char **argv)
 
       case AnaInfo::FLAG_CREATE_THUMBS:
          fFlagCreateThumbs = kTRUE;
-         break;
-
-      case AnaInfo::FLAG_COPY:
-         fFlagCopyResults = kTRUE;
          break;
 
       case AnaInfo::FLAG_UPDATE_DB:
