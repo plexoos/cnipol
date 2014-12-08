@@ -221,7 +221,9 @@ int main(int argc, char *argv[])
 
    if (mAsymAnaInfo.fFlagUpdateDb) {
       AsymDbSql asymDbSql;
+      asymDbSql.OpenConnection();
       anaGlobResult.UpdateInsertDb(asymDbSql);
+      asymDbSql.CloseConnection();
    }
 
    gH->Write();

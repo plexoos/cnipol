@@ -646,7 +646,6 @@ void AnaGlobResult::CalcDependencies()
 /** */
 void AnaGlobResult::UpdateInsertDb(AsymDbSql &asymDbSql) const
 {
-   asymDbSql.OpenConnection();
    AnaFillResultMapConstIter iFillRes = fAnaFillResults.begin();
 
    for ( ; iFillRes != fAnaFillResults.end(); ++iFillRes)
@@ -772,7 +771,6 @@ void AnaGlobResult::UpdateInsertDb(AsymDbSql &asymDbSql) const
       asymDbSql->UpdateInsert(ofillProf, nfillProf);
       */
    }
-   asymDbSql.CloseConnection();
 }
 
 
