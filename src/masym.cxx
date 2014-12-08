@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
       mAsymRoot.SaveAs("^.*$", mAsymAnaInfo.GetImageDir());
 
    if (mAsymAnaInfo.fFlagUpdateDb) {
-      AsymDbSql *asymDbSql = new AsymDbSql();
+      AsymDbSql asymDbSql;
       anaGlobResult.UpdateInsertDb(asymDbSql);
    }
 

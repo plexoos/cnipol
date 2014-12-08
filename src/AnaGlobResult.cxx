@@ -644,15 +644,9 @@ void AnaGlobResult::CalcDependencies()
 
 
 /** */
-void AnaGlobResult::UpdateInsertDb(AsymDbSql *asymDbSql)
+void AnaGlobResult::UpdateInsertDb(AsymDbSql &asymDbSql) const
 {
-   if (!asymDbSql) {
-      Error("UpdateInsertDb", "Cannot connect to MySQL DB");
-      return;
-   }
-
-   asymDbSql->OpenConnection();
-
+   asymDbSql.OpenConnection();
    AnaFillResultMapConstIter iFillRes = fAnaFillResults.begin();
 
    for ( ; iFillRes != fAnaFillResults.end(); ++iFillRes)
@@ -676,7 +670,7 @@ void AnaGlobResult::UpdateInsertDb(AsymDbSql *asymDbSql)
          ERingId        ringId = RunConfig::GetRingId(polId);
 
          // Polarization
-         MseFillPolarNewX* ofillP = asymDbSql->SelectFillPolar(fillId, polId, ringId);
+         MseFillPolarNewX* ofillP = asymDbSql.SelectFillPolar(fillId, polId, ringId);
          MseFillPolarNewX* nfillP = 0;
 
          if (ofillP) { // if fill found in database copy it to new one
@@ -686,7 +680,7 @@ void AnaGlobResult::UpdateInsertDb(AsymDbSql *asymDbSql)
          }
 
          nfillP->SetValuesPC(fillResult, polId);
-         asymDbSql->UpdateInsert(ofillP, nfillP);
+         asymDbSql.UpdateInsert(ofillP, nfillP);
 
          //TargetUId targetUId = fillRslt->GetPCTarget(polId);
          //if (!targetUId.IsValid()) continue;
@@ -706,7 +700,7 @@ void AnaGlobResult::UpdateInsertDb(AsymDbSql *asymDbSql)
             }
 
 
-            MseFillProfileNewX* ofillProf = asymDbSql->SelectFillProfile(fillId, polId, tgtOrient);
+            MseFillProfileNewX* ofillProf = asymDbSql.SelectFillProfile(fillId, polId, tgtOrient);
             MseFillProfileNewX* nfillProf = 0;
 
             if (ofillProf) { // if fill found in database copy it to new one
@@ -716,7 +710,7 @@ void AnaGlobResult::UpdateInsertDb(AsymDbSql *asymDbSql)
             }
 
             nfillProf->SetValues(fillResult, polId, tgtOrient);
-            asymDbSql->UpdateInsert(ofillProf, nfillProf);
+            asymDbSql.UpdateInsert(ofillProf, nfillProf);
          }
       }
 
@@ -728,7 +722,7 @@ void AnaGlobResult::UpdateInsertDb(AsymDbSql *asymDbSql)
          EPolarimeterId polId = kHJET;
          ERingId ringId = *iRingId;
 
-         MseFillPolarNewX* ofillP = asymDbSql->SelectFillPolar(fillId, polId, ringId);
+         MseFillPolarNewX* ofillP = asymDbSql.SelectFillPolar(fillId, polId, ringId);
          MseFillPolarNewX* nfillP = 0;
 
          if (ofillP) { // if fill found in database copy it to new one
@@ -738,7 +732,7 @@ void AnaGlobResult::UpdateInsertDb(AsymDbSql *asymDbSql)
          }
 
          nfillP->SetValuesHJ(fillResult, ringId);
-         asymDbSql->UpdateInsert(ofillP, nfillP);
+         asymDbSql.UpdateInsert(ofillP, nfillP);
       }
       // test end
       // test end
@@ -778,8 +772,7 @@ void AnaGlobResult::UpdateInsertDb(AsymDbSql *asymDbSql)
       asymDbSql->UpdateInsert(ofillProf, nfillProf);
       */
    }
-
-   asymDbSql->CloseConnection();
+   asymDbSql.CloseConnection();
 }
 
 
