@@ -8,7 +8,6 @@ import os
 
 def main():
 
-   #fileAllMeas = open("/eicdata/eic0005/runXX/lists/run13_phys")
    fileAllMeas = open("/eicdata/eic0005/runXX/lists/run13_new")
    allMeass    = fileAllMeas.readlines()
    fills = []
