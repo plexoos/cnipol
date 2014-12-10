@@ -84,29 +84,21 @@ int main(int argc, char *argv[])
          continue;
       }
 
-      TFile *f = new TFile(fileName.c_str(), "READ");
+      TFile f(fileName.c_str(), "READ");
 
-      if (!f) {
-         Error("masym", "file not found. Skipping...");
-         delete f;
-         continue;
-      }
-
-      if (f->IsZombie()) {
-         Error("masym", "file is zombie %s. Skipping...", fileName.c_str());
-         f->Close();
-         delete f;
+      if (f.IsZombie()) {
+         Error("masym", "File not found or zombie: %s. Skipping...", fileName.c_str());
+         f.Close();
          continue;
       }
 
       Info("masym", "Found file: %s", fileName.c_str());
 
-      EventConfig *gMM = (EventConfig*) f->FindObjectAny("measConfig");
+      EventConfig *gMM = (EventConfig*) f.FindObjectAny("measConfig");
 
       if (!gMM) {
          Error("masym", "MM not found. Skipping...");
-         f->Close();
-         delete f;
+         f.Close();
          continue;
       }
 
@@ -150,15 +142,14 @@ int main(int argc, char *argv[])
                 RunConfig::AsString(gMM->fMeasInfo->fMeasType).c_str(), profileRatio,
                 profileRatioErr );
 
-         f->Close();
-         delete f;
+         f.Close();
          continue;
       }
 
       mAsymRoot.UpdMinMax(*gMM);
 
       // Check that asym hist container exists in this file
-      DrawObjContainer *gHIn = new DrawObjContainer(f);
+      DrawObjContainer *gHIn = new DrawObjContainer(&f);
       gHIn->d["asym"] = new CnipolAsymHists();
       gHIn->ReadFromDir();
 
@@ -168,8 +159,7 @@ int main(int argc, char *argv[])
 
       delete gHIn;
 
-      f->Close();
-      delete f;
+      f.Close();
 
       gGoodMeass.insert(*gMM);
    }
