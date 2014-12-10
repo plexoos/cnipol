@@ -52,8 +52,6 @@ extern StructBunchCheck bnchchk;
 extern const int   ASYM_DEFAULT;
 extern const float MSIZE; // marker size
 
-extern int   wcmfillpat[N_BUNCHES];   // fill pattern within the Wall Current Monitor Average Ragne 
-
 extern long int Ncounts[N_DETECTORS][N_BUNCHES];             // counts per detector per bunch
 extern long int NTcounts[N_DETECTORS][N_BUNCHES][NTBIN];     // counts 6detectors 120 bunches 6 tranges
 extern long int NDcounts[N_DETECTORS][N_BUNCHES][MAXDELIM];  // counts 6detectors 120 bunches per delimiter
@@ -73,7 +71,6 @@ extern MeasInfo                     *gMeasInfo;
 extern AnaMeasResult                *gAnaMeasResult;
 extern AsymRoot                     *gAsymRoot;
 extern ErrorDetector                 errdet;
-extern atdata_struct                 atdata;
 extern RunConfig                     gRunConfig;
 extern StructExtInput                extinput;
 extern StructAverage                 average;

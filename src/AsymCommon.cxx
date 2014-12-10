@@ -19,8 +19,6 @@ using namespace std;
 const int   ASYM_DEFAULT = -999;
 const float MSIZE = 1.2;            // Marker size
 
-int     wcmfillpat[120];            // spin pattern 120 bunches (ADO info)
-
 long    Ncounts[6][120];            // counts 6detectors 120 bunches
 long    NTcounts[6][120][NTBIN];    // counts 6detectors 120 bunches 6 tranges
 long    NRcounts[6][120][RAMPTIME]; // counts for 6det 120bunch RAMPTIME sec
@@ -34,7 +32,6 @@ char    CalibFile[256];             // energy calibration file
 
 float   ramptshift[500];            // ramp timing shift
 
-long   *pointer;
 int     gNDelimeters;
 int     TgtIndex[MAXDELIM];
 int     nTgtIndex = 0;
@@ -135,7 +132,6 @@ AnaMeasResult            *gAnaMeasResult;
 AsymRoot                 *gAsymRoot;
 UShort_t                 *gCh2WfdMap = 0;
 RunConfig                 gRunConfig;
-atdata_struct             atdata;
 StructAverage             average;
 StructFeedBack            feedback;
 map<UShort_t, RunConst>   gRunConsts;
