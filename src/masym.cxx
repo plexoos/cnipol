@@ -73,17 +73,6 @@ int main(int argc, char *argv[])
       std::string measId   = std::string(((TObjString*) o)->GetName());
       std::string fileName = mAsymAnaInfo.GetResultsDir() + "/" + measId + "/" + measId + mAsymAnaInfo.GetSuffix() + ".root";
 
-      // Check for fills of no interest
-      std::stringstream ssMeasId(measId);
-      Int_t        nFillId;
-
-      ssMeasId >> nFillId;
-
-      if ( nFillId >= 17064 && nFillId <= 17084 ) {
-         Error("masym", "Encountered vetoed fillId: %d. Skipping...", nFillId);
-         continue;
-      }
-
       TFile f(fileName.c_str(), "READ");
 
       if (f.IsZombie()) {
