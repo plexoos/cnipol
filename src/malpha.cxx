@@ -13,6 +13,8 @@
 #include "TLegend.h"
 
 #include <opencdev.h>
+#include <SshLogReader.h>
+#include <CachingLogReader.h>
 
 #include "MAlphaAnaInfo.h"
 #include "AsymHeader.h"
@@ -36,7 +38,6 @@ struct ResultMean
 
    // used for histogram limits
    double       min_value, max_value;
-   double       mean, sigma;
 };
 
 
@@ -82,16 +83,12 @@ void FillDeviceMaxMin(map<Short_t, ResultMean> &results)
    double min_value = FLT_MAX;
    double max_value = -FLT_MAX;
 
-   double mean_sum = 0;
-   int count = 0;
-
    for (map<Short_t, ResultMean>::const_iterator i = results.begin(); i != results.end(); i++)
    {
       const ResultMean &result = i->second;
 
       for (int det = 0; det < N_DETECTORS; det++)
       {
-         // find min and max values
          for (map< Time, vector<double> >::const_iterator it = result.second.begin(); it != result.second.end(); it++)
          {
             double value = it->second[det];
@@ -104,51 +101,14 @@ void FillDeviceMaxMin(map<Short_t, ResultMean> &results)
                max_value = value;
             }
          }
-
-         // also we use information about mean values and their width
-         // to calculate limits for plots that are not interested in outliers (such as PlotMean())
-         for (map< Time, vector<double> >::const_iterator it = result.second.begin(); it != result.second.end(); it++)
-         {
-            double value = it->second[det];
-            if (!isnan(value))
-            {
-               mean_sum += value;
-               count++;
-            }
-         }
       }
    }
-   double mean = mean_sum / count;
-
-   int count_crosscheck = 0;
-   double sigma_sum = 0;
-   for (map<Short_t, ResultMean>::const_iterator i = results.begin(); i != results.end(); i++)
-   {
-      const ResultMean &result = i->second;
-
-      for (int det = 0; det < N_DETECTORS; det++)
-      {
-         for (map< Time, vector<double> >::const_iterator it = result.second.begin(); it != result.second.end(); it++)
-         {
-            double value = it->second[det];
-            if (!isnan(value))
-            {
-               sigma_sum += (mean - value) * (mean - value);
-               count_crosscheck++;
-            }
-         }
-      }
-   }
-   assert(count == count_crosscheck);
-   double sigma = sqrt(sigma_sum / count);
 
    for (map<Short_t, ResultMean>::iterator i = results.begin(); i != results.end(); i++)
    {
       ResultMean &result = i->second;
       result.min_value = min_value;
       result.max_value = max_value;
-      result.mean = mean;
-      result.sigma = sigma;
    }
 }
 
@@ -165,7 +125,7 @@ Color_t GetLineColor(int det)
 
 
 /** */
-void PlotMean(DrawObjContainer *oc, const string &polIdName, const char *name, ResultMean &result, ResultMean &result_err, map<Time, RunName> &runNameD, double min_startTime, double max_startTime)
+void PlotMean(DrawObjContainer *oc, const char *name, ResultMean &result, ResultMean &result_err, map<Time, RunName> &runNameD, double min_startTime, double max_startTime)
 {
    if (result.first.empty() && result.second.empty())
    {
@@ -176,7 +136,6 @@ void PlotMean(DrawObjContainer *oc, const string &polIdName, const char *name, R
    TH1F  *h;
 
    TString hname(name);
-   hname += polIdName;
    if (max_startTime)
    {
       h = new TH1F(hname, name, 100 * result.first.size(), -86400, max_startTime - min_startTime + 86400);
@@ -214,7 +173,6 @@ void PlotMean(DrawObjContainer *oc, const string &polIdName, const char *name, R
       h->GetXaxis()->SetTimeDisplay(1);
       h->GetXaxis()->SetTimeFormat("%m/%d/%y");
       h->GetXaxis()->SetTimeOffset(min_startTime);
-      h->GetXaxis()->SetNdivisions(8);
    }
    h->SetYTitle(result.YTitle.c_str());
 
@@ -230,8 +188,6 @@ void PlotMean(DrawObjContainer *oc, const string &polIdName, const char *name, R
          TString hname(name);
          hname += "_distribution";
          hname += (det + 1);
-         hname += "_";
-         hname += polIdName;
          hdet = new TH1F(hname, hname, 100, result.min_value, result.max_value);
          hdet->SetXTitle(h->GetYaxis()->GetTitle());
          hdet->SetLineColor(GetLineColor(det));
@@ -247,11 +203,6 @@ void PlotMean(DrawObjContainer *oc, const string &polIdName, const char *name, R
 
    TString  canvasName("c");
    canvasName += name;
-   canvasName += "_";
-   canvasName += polIdName;
-   TString  title(name);
-   const char *cut_str = " (cut: |val-mean_i|<3*sigma_i)";
-   title += cut_str;
    TCanvas *c = new TCanvas(canvasName, "", 800, 500);
    double bm = gStyle->GetPadBottomMargin();
    TLegend *leg = new TLegend(0.14,bm+0.02,0.22,bm+0.202);
@@ -259,36 +210,31 @@ void PlotMean(DrawObjContainer *oc, const string &polIdName, const char *name, R
    vector<TH1F*>  det_hosts;
    TString	host_name("_");
    host_name += name;
-   host_name += polIdName;
    if (max_startTime)
    {
-      host = new TH1F(host_name, title, 100 * result.first.size(), -86400, max_startTime - min_startTime + 86400);
+      host = new TH1F(host_name, "", 100 * result.first.size(), -86400, max_startTime - min_startTime + 86400);
    }
    else
    {
-      host = new TH1F(host_name, title, result.first.size(), 0.0, result.first.size());
+      host = new TH1F(host_name, "", result.first.size(), 0.0, result.first.size());
    }
 
-   double canvas_min = result.mean - 3*result.sigma;
-   double canvas_max = result.mean + 3*result.sigma;
+   double canvas_min = result.min_value;
+   double canvas_max = result.max_value;
    host->GetYaxis()->SetRangeUser(canvas_min, canvas_max);
 
    for (int det = 0; det < N_DETECTORS; det++)
    {
       TString   det_host_name(name);
       det_host_name += (det+1);
-      det_host_name += "_";
-      det_host_name += polIdName;
-      TString  det_title(det_host_name);
-      det_title += cut_str;
 
       if (max_startTime)
       {
-         det_host = new TH1F(det_host_name, det_title, 100 * result.first.size(), -86400, max_startTime - min_startTime + 86400);
+         det_host = new TH1F(det_host_name, "", 100 * result.first.size(), -86400, max_startTime - min_startTime + 86400);
       }
       else
       {
-         det_host = new TH1F(det_host_name, det_title, result.first.size(), 0.0, result.first.size());
+         det_host = new TH1F(det_host_name, "", result.first.size(), 0.0, result.first.size());
       }
       o[det_host_name.Data()] = det_host;
 
@@ -298,11 +244,9 @@ void PlotMean(DrawObjContainer *oc, const string &polIdName, const char *name, R
       g->SetLineColor(line_color);
       g->SetMarkerColor(line_color);
       g->SetMarkerStyle(20);
-      g->SetMarkerSize(0.4);
       det_g->SetLineColor(line_color);
       det_g->SetMarkerColor(line_color);
       det_g->SetMarkerStyle(20);
-      det_g->SetMarkerSize(0.4);
       int i = 0;
       double xval = -0.5;
 
@@ -333,17 +277,6 @@ void PlotMean(DrawObjContainer *oc, const string &polIdName, const char *name, R
             g->RemovePoint(i);
             det_g->RemovePoint(i);
             continue;
-         }
-
-         if (value > canvas_max)
-         {
-            Warning("malpha", "value %f of %s is more than canvas_max of %f",
-               value, result.YTitle.c_str(), canvas_max);
-         }
-         if (value < canvas_min)
-         {
-            Warning("malpha", "value %f of %s is less than canvas_min of %f",
-               value, result.YTitle.c_str(), canvas_min);
          }
 
          g->SetPoint(i, xval, value);
@@ -391,7 +324,6 @@ void PlotMean(DrawObjContainer *oc, const string &polIdName, const char *name, R
       det_host->GetXaxis()->SetTimeDisplay(1);
       det_host->GetXaxis()->SetTimeFormat("%m/%d/%y");
       det_host->GetXaxis()->SetTimeOffset(min_startTime);
-      det_host->GetXaxis()->SetNdivisions(8);
       det_host->SetXTitle(sDet);
       det_host->SetYTitle(h->GetYaxis()->GetTitle());
       if (!max_startTime)
@@ -405,7 +337,6 @@ void PlotMean(DrawObjContainer *oc, const string &polIdName, const char *name, R
    host->GetXaxis()->SetTimeDisplay(1);
    host->GetXaxis()->SetTimeFormat("%m/%d/%y");
    host->GetXaxis()->SetTimeOffset(min_startTime);
-   host->GetXaxis()->SetNdivisions(8);
    host->SetYTitle(h->GetYaxis()->GetTitle());
       if (!max_startTime)
       {
@@ -427,7 +358,7 @@ void PlotMean(DrawObjContainer *oc, const string &polIdName, const char *name, R
 }
 
 
-void PlotCorrelation(DrawObjContainer *oc, const string &polIdName, const char *name, ResultMean &r1, ResultMean &r1_err, ResultMean &r2, ResultMean &r2_err)
+void PlotCorrelation(DrawObjContainer *oc, const char *name, ResultMean &r1, ResultMean &r1_err, ResultMean &r2, ResultMean &r2_err)
 {
    if ((r1.first.empty() && r1.second.empty()) || (r2.first.empty() && r2.second.empty()))
    {
@@ -436,11 +367,10 @@ void PlotCorrelation(DrawObjContainer *oc, const string &polIdName, const char *
 
    ObjMap	&o = oc->o;
    TString	hname(name);
-   hname += "_";
-   hname += polIdName;
    TH2F	*h = new TH2F(hname, hname,
                       r1.max_value - r1.min_value, r1.min_value, r1.max_value,
                       r2.max_value - r2.min_value, r2.min_value, r2.max_value);
+   h->SetOption("DUMMY");
 
    for (int det = 0; det < N_DETECTORS; det++)
    {
@@ -631,6 +561,21 @@ void FillBeamCurrent(opencdev::LogReader *log_reader, int fill_id, EPolarimeterI
 }
 
 
+void SetupSignature(DrawObjContainer *oc, MAlphaAnaInfo &mAlphaAnaInfo)
+{
+   char strAnaTime[25];
+   time_t currentTime = time(0);
+   tm *ltime = localtime( &currentTime );
+   strftime(strAnaTime, 25, "%c", ltime);
+
+   stringstream ssSignature;
+   ssSignature << "malpha, Analyzed " << strAnaTime;
+   ssSignature << ", Version " << mAlphaAnaInfo.GetShortAsymVersion()  << ", " << mAlphaAnaInfo.fUserGroup.fUser;
+   cout << ssSignature.str();
+   oc->SetSignature(ssSignature.str());
+}
+
+
 /** */
 int main(int argc, char *argv[])
 {
@@ -646,9 +591,14 @@ int main(int argc, char *argv[])
    mAlphaAnaInfo.ProcessOptions(argc, argv);
    mAlphaAnaInfo.VerifyOptions();
 
-   opencdev::LocalLogReader log_reader(mAlphaAnaInfo.GetSlowControlLogDir());
+   opencdev::LogReader *log_reader;
+   if (mAlphaAnaInfo.fUseSsh) {
+      log_reader = new CachingLogReader<SshLogReader>;
+   } else {
+      log_reader = new opencdev::LocalLogReader(mAlphaAnaInfo.GetSlowControlLogDir());
+   }
 
-   gROOT->Macro("~/rootmacros/styles/style_malpha.C");
+   gROOT->Macro(CNIPOL_ROOT_DIR "/contrib/styles/style_malpha.C");
 
    string filelist = mAlphaAnaInfo.GetMListFullPath();
 
@@ -751,12 +701,12 @@ int main(int argc, char *argv[])
          min_startTime = startTime;
       }
 
-      FillBiasCurrent(&log_reader, (EPolarimeterId)polId, startTime, ssh_endTime, rBiasCurrent, rBiasCurrentErr);
+      FillBiasCurrent(log_reader, (EPolarimeterId)polId, startTime, ssh_endTime, rBiasCurrent, rBiasCurrentErr);
 
       int fill_id = gMM->fMeasInfo->GetFillId();
       if (fill_id)
       {
-         FillBeamCurrent(&log_reader, fill_id, (EPolarimeterId)polId, startTime, rBeamCurrent, rBeamCurrentErr);
+         FillBeamCurrent(log_reader, fill_id, (EPolarimeterId)polId, startTime, rBeamCurrent, rBeamCurrentErr);
       }
 
       TH1F  *hAmGain = (TH1F*) f.FindObjectAny("hAmGain");
@@ -783,6 +733,7 @@ int main(int argc, char *argv[])
 
    TFile *f1 = new TFile(mAlphaAnaInfo.fOutputFileName.c_str(), "RECREATE");
    DrawObjContainer *oc = new DrawObjContainer(f1);
+   SetupSignature(oc, mAlphaAnaInfo);
    PolarimeterIdSetConstIter iPolId;
 
    FillDeviceMaxMin(rhAmGain);
@@ -803,32 +754,35 @@ int main(int argc, char *argv[])
       oc->d[polIdName] = new DrawObjContainer(f1->mkdir(polIdName.c_str()));
       DrawObjContainer *sub_oc = oc->d[polIdName];
 
+      sub_oc->fDir->cd();
+      gROOT->GetListOfCanvases()->Clear(); // hack to prevent canvas deletion
+
       slope[*iPolId] = DoAmGainCorrection(rhAmGain[polId], rhAmGainErr[polId], rBiasCurrent[polId], rhAmGainCorrected[polId], rhAmGainCorrectedErr[polId]);
 
-      PlotMean(sub_oc, polIdName, "hAmGain_by_day", rhAmGain[polId], rhAmGainErr[polId], runNameD[polId], min_startTime, max_startTime);
-      PlotMean(sub_oc, polIdName, "hAmGainCorrected_by_day", rhAmGainCorrected[polId], rhAmGainCorrectedErr[polId], runNameD[polId], min_startTime, max_startTime);
-      PlotMean(sub_oc, polIdName, "hGdGain_over_AmGain_by_day", rhGdGain_over_AmGain[polId], rhGdGain_over_AmGainErr[polId], runNameD[polId], min_startTime, max_startTime);
-      PlotMean(sub_oc, polIdName, "hAmGdGain_over_AmGain_by_day", rhAmGdGain_over_AmGain[polId], rhAmGdGain_over_AmGainErr[polId], runNameD[polId], min_startTime, max_startTime);
-      PlotMean(sub_oc, polIdName, "hDeadLayerEnergy_by_day", rDeadLayerEnergy[polId], rDeadLayerEnergyErr[polId], runNameD[polId], min_startTime, max_startTime);
-      PlotMean(sub_oc, polIdName, "hDeadLayerSize_by_day", rDeadLayerSize[polId], rDeadLayerSizeErr[polId], runNameD[polId], min_startTime, max_startTime);
-      PlotMean(sub_oc, polIdName, "hBiasCurrent_by_day", rBiasCurrent[polId], rBiasCurrentErr[polId], runNameD[polId], min_startTime, max_startTime);
-      PlotMean(sub_oc, polIdName, "hAmGain_by_run", rhAmGain[polId], rhAmGainErr[polId], runNameD[polId], 0, 0);
-      PlotMean(sub_oc, polIdName, "hAmGainCorrected_by_run", rhAmGainCorrected[polId], rhAmGainCorrectedErr[polId], runNameD[polId], 0, 0);
-      PlotMean(sub_oc, polIdName, "hGdGain_over_AmGain_by_run", rhGdGain_over_AmGain[polId], rhGdGain_over_AmGainErr[polId], runNameD[polId], 0, 0);
-      PlotMean(sub_oc, polIdName, "hAmGdGain_over_AmGain_by_run", rhAmGdGain_over_AmGain[polId], rhAmGdGain_over_AmGainErr[polId], runNameD[polId], 0, 0);
-      PlotMean(sub_oc, polIdName, "hDeadLayerEnergy_by_run", rDeadLayerEnergy[polId], rDeadLayerEnergyErr[polId], runNameD[polId], 0, 0);
-      PlotMean(sub_oc, polIdName, "hDeadLayerSize_by_run", rDeadLayerSize[polId], rDeadLayerSizeErr[polId], runNameD[polId], 0, 0);
-      PlotMean(sub_oc, polIdName, "hBiasCurrent_by_run", rBiasCurrent[polId], rBiasCurrentErr[polId], runNameD[polId], 0, 0);
+      PlotMean(sub_oc, "hAmGain_by_day", rhAmGain[polId], rhAmGainErr[polId], runNameD[polId], min_startTime, max_startTime);
+      PlotMean(sub_oc, "hAmGainCorrected_by_day", rhAmGainCorrected[polId], rhAmGainCorrectedErr[polId], runNameD[polId], min_startTime, max_startTime);
+      PlotMean(sub_oc, "hGdGain_over_AmGain_by_day", rhGdGain_over_AmGain[polId], rhGdGain_over_AmGainErr[polId], runNameD[polId], min_startTime, max_startTime);
+      PlotMean(sub_oc, "hAmGdGain_over_AmGain_by_day", rhAmGdGain_over_AmGain[polId], rhAmGdGain_over_AmGainErr[polId], runNameD[polId], min_startTime, max_startTime);
+      PlotMean(sub_oc, "hDeadLayerEnergy_by_day", rDeadLayerEnergy[polId], rDeadLayerEnergyErr[polId], runNameD[polId], min_startTime, max_startTime);
+      PlotMean(sub_oc, "hDeadLayerSize_by_day", rDeadLayerSize[polId], rDeadLayerSizeErr[polId], runNameD[polId], min_startTime, max_startTime);
+      PlotMean(sub_oc, "hBiasCurrent_by_day", rBiasCurrent[polId], rBiasCurrentErr[polId], runNameD[polId], min_startTime, max_startTime);
+      PlotMean(sub_oc, "hAmGain_by_run", rhAmGain[polId], rhAmGainErr[polId], runNameD[polId], 0, 0);
+      PlotMean(sub_oc, "hAmGainCorrected_by_run", rhAmGainCorrected[polId], rhAmGainCorrectedErr[polId], runNameD[polId], 0, 0);
+      PlotMean(sub_oc, "hGdGain_over_AmGain_by_run", rhGdGain_over_AmGain[polId], rhGdGain_over_AmGainErr[polId], runNameD[polId], 0, 0);
+      PlotMean(sub_oc, "hAmGdGain_over_AmGain_by_run", rhAmGdGain_over_AmGain[polId], rhAmGdGain_over_AmGainErr[polId], runNameD[polId], 0, 0);
+      PlotMean(sub_oc, "hDeadLayerEnergy_by_run", rDeadLayerEnergy[polId], rDeadLayerEnergyErr[polId], runNameD[polId], 0, 0);
+      PlotMean(sub_oc, "hDeadLayerSize_by_run", rDeadLayerSize[polId], rDeadLayerSizeErr[polId], runNameD[polId], 0, 0);
+      PlotMean(sub_oc, "hBiasCurrent_by_run", rBiasCurrent[polId], rBiasCurrentErr[polId], runNameD[polId], 0, 0);
 
-      PlotCorrelation(sub_oc, polIdName, "hBiasCurrent_AmGain", rBiasCurrent[polId], rBiasCurrentErr[polId], rhAmGain[polId], rhAmGainErr[polId]);
-      PlotCorrelation(sub_oc, polIdName, "hBiasCurrent_DeadLayerSize", rBiasCurrent[polId], rBiasCurrentErr[polId], rDeadLayerSize[polId], rDeadLayerSizeErr[polId]);
-      PlotCorrelation(sub_oc, polIdName, "hBiasCurrent_BeamCurrent", rBiasCurrent[polId], rBiasCurrentErr[polId], rBeamCurrent[polId], rBeamCurrentErr[polId]);
+      PlotCorrelation(sub_oc, "hBiasCurrent_AmGain", rBiasCurrent[polId], rBiasCurrentErr[polId], rhAmGain[polId], rhAmGainErr[polId]);
+      PlotCorrelation(sub_oc, "hBiasCurrent_DeadLayerSize", rBiasCurrent[polId], rBiasCurrentErr[polId], rDeadLayerSize[polId], rDeadLayerSizeErr[polId]);
+      PlotCorrelation(sub_oc, "hBiasCurrent_BeamCurrent", rBiasCurrent[polId], rBiasCurrentErr[polId], rBeamCurrent[polId], rBeamCurrentErr[polId]);
    }
 
    if (mAlphaAnaInfo.HasGraphBit())
    {
-      TCanvas r("r");
-      oc->SaveAllAs(DrawObjContainer::FORMAT_EPS, r, "^.*$", mAlphaAnaInfo.GetImageDir(), false);
+      TCanvas r("r", "", 1000, 800);
+      oc->SaveAllAs(DrawObjContainer::FORMAT_PNG, r, "^.*$", mAlphaAnaInfo.GetImageDir(), false);
    }
    oc->Write();
    f1->Close();

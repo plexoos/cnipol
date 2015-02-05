@@ -403,9 +403,12 @@ void DrawObjContainer::SaveAllAs(ImageFormat fmt_ext, TCanvas &default_canvas, s
             }
             PrepareHistogram(canvas, (TH1*)child);
          }
+         canvas->SetCanvasSize(default_canvas.GetWw(), default_canvas.GetWh());
       }
-
-      canvas->SetName(sCanvasName.c_str());
+      else
+      {
+        canvas->SetName(sCanvasName.c_str());
+      }
       canvas->SetTitle(sCanvasName.c_str());
 
       if ( ((TClass*) obj->IsA())->InheritsFrom("THStack") )
@@ -426,8 +429,11 @@ void DrawObjContainer::SaveAllAs(ImageFormat fmt_ext, TCanvas &default_canvas, s
       signature.SetTextSize(0.035);
       UInt_t w, h;
       signature.GetTextExtent(w, h, signature.GetTitle());
+      TVirtualPad *backup = gPad;
+      canvas->cd();
       //signature.DrawTextNDC(0.98-(w/(Float_t) canvas->GetWw()) - gStyle->GetPadRightMargin(), 1-(h/(Float_t) canvas->GetWh()), signature.GetTitle());
       signature.DrawTextNDC(0.98-(w/(Float_t) canvas->GetWw()), 1-(h/(Float_t) canvas->GetWh()), signature.GetTitle());
+      gPad = backup;
 
       canvas->RedrawAxis("g");
 
