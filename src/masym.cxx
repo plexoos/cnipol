@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
       anaGlobResult.UpdateInsertDb(asymDbSql);
       asymDbSql.CloseConnection();
    }
-   Info("masym", "HERE I AM3...");
+
    gH->Write();
 
    mAsymRoot.Print();
