@@ -236,7 +236,6 @@ void MeasInfo::PrintConfig()
    fprintf(stdout, "=== RHIC Polarimeter Configuration (BGN) ===\n");
 
    // Configulation File
-   fprintf(stdout,"             CONFIG = %s\n", reConfFile);
    fprintf(stdout,"              CALIB = %s\n", CalibFile);
 
    // tshift in [ns]
