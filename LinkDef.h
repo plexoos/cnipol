@@ -31,7 +31,6 @@
 #pragma link C++ class CnipolPreprocHists+;
 #pragma link C++ class CnipolProfileHists+;
 #pragma link C++ class CnipolPulserHists+;
-#pragma link C++ class CnipolRawExtendedHists+;
 #pragma link C++ class CnipolRawHists+;
 #pragma link C++ class CnipolRunHists+;
 #pragma link C++ class CnipolScalerHists+;
@@ -45,6 +44,7 @@
 #pragma link C++ class MAsymAnaInfo+;
 #pragma link C++ class MAsymFillHists+;
 #pragma link C++ class MAsymSingleFillHists+;
+#pragma link C++ class RunConfig+;
 #pragma link C++ class RunQA+;
 #pragma link C++ class Target+;
 #pragma link C++ class TargetUId+;
@@ -59,5 +59,10 @@
 #pragma link C++ class AnaGlobResult;
 #pragma link C++ class AnaMeasResult;
 #pragma link C++ class MeasInfo;
+
+// misc
+#pragma link C++ class ChannelCalibMap+;
+#pragma link C++ class ChannelCalibMap::iterator+;
+#pragma link C++ class ChannelCalibMap::value_type+;
 
 #endif

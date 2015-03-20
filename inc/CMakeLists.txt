@@ -28,7 +28,6 @@ SET(
 	${CMAKE_CURRENT_SOURCE_DIR}/CnipolPreprocHists.h
 	${CMAKE_CURRENT_SOURCE_DIR}/CnipolProfileHists.h
 	${CMAKE_CURRENT_SOURCE_DIR}/CnipolPulserHists.h
-	${CMAKE_CURRENT_SOURCE_DIR}/CnipolRawExtendedHists.h
 	${CMAKE_CURRENT_SOURCE_DIR}/CnipolRawHists.h
 	${CMAKE_CURRENT_SOURCE_DIR}/CnipolRunHists.h
 	${CMAKE_CURRENT_SOURCE_DIR}/CnipolScalerHists.h
@@ -45,8 +44,10 @@ SET(
 	${CMAKE_CURRENT_SOURCE_DIR}/MAsymRunHists.h
 	${CMAKE_CURRENT_SOURCE_DIR}/MAsymSingleFillHists.h
 	${CMAKE_CURRENT_SOURCE_DIR}/MeasInfo.h
+	${CMAKE_CURRENT_SOURCE_DIR}/RunConfig.h
 	${CMAKE_CURRENT_SOURCE_DIR}/RunQA.h
 	${CMAKE_CURRENT_SOURCE_DIR}/Target.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../contrib/polarim-online/include/rpoldata.h
+	${OPENCDEV_INCLUDE_DIR}/opencdev.h
 	PARENT_SCOPE
 	)

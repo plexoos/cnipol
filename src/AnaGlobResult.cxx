@@ -255,7 +255,7 @@ void AnaGlobResult::AddMeasResult(EventConfig &mm, DrawObjContainer *ocIn)
 void AnaGlobResult::AddHJMeasResult()
 {
    std::stringstream fullPath("");
-   fullPath << fPathExternResults << "/hjet_pol_run13";
+   fullPath << fPathExternResults << "/hjet_pol_run15";
    ifstream file(fullPath.str().c_str());
 
    Info("AddHJMeasResult", "Adding HJet polarization from file: %s", fullPath.str().c_str());
@@ -273,11 +273,12 @@ void AnaGlobResult::AddHJMeasResult()
       {
          iline++;
 
-	 file >> fillId >> yelAsym >> yelAsymErr
-	      >> yelPolar >> yelPolarErr
-	      >> bluAsym >> bluAsymErr
+	 file >> fillId >> bluAsym >> bluAsymErr
 	      >> bluPolar >> bluPolarErr
+	      >> yelAsym >> yelAsymErr
+	      >> yelPolar >> yelPolarErr
 	      >> energy;
+	 // The file format of the H-jet result has blue first then yellow. Not vise versa.
 
          if (file.eof()) break;
 
@@ -329,16 +330,7 @@ void AnaGlobResult::Process(DrawObjContainer *ocOut)
 
    for ( ; iFill != fAnaFillResults.end(); ++iFill)
    {
-      UInt_t         fillId  = iFill->first;
       AnaFillResult &anaFillResult = iFill->second;
-
-      // First read the extern info if available...
-      // Check whether a file with external info exists. Create corresponding
-      // object if yes
-      std::stringstream fullPath("");
-      fullPath << fPathExternResults << "/cdev_info/cdev_" << fillId;
-      ifstream file(fullPath.str().c_str());
-      anaFillResult.AddExternInfo(file);
 
       // anaFillResult.fStartTime is properly determined at this stage
       // ... then do the rest

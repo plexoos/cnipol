@@ -147,20 +147,33 @@ int main(int argc, char *argv[])
 
    rawDataReader.ReadDataPassOne(*mseMeasInfoX);  // Fill primary histograms
    gAsymRoot->FillDerivedPassOne();         // Fill other histograms from the primary ones
-   gAsymRoot->Calibrate();                  // Process all channel alpha peak. XXX May need to change call order
+   if (gAsymAnaInfo->HasNormalBit())
+   {
+      gAsymRoot->Calibrate();
+   }
    gAsymRoot->PostFillPassOne();            // Make decisions based on hist content/data
 
    printf("After PostFillPassOne!\n");
 
    // PassTwo
-   if ( !gAsymAnaInfo->HasAlphaBit() ) {
-      gAsymRoot->PreFill();
+   gAsymRoot->PreFill();
+   rawDataReader.ReadDataPassTwo(*mseMeasInfoX);
+   if (gAsymAnaInfo->HasAlphaBit() ) {
+      gAsymRoot->Calibrate();
+   }
+   gAsymRoot->FillDerived();
+   gAsymRoot->PostFill();
 
-      // Main event Loop
-      rawDataReader.ReadDataPassTwo(*mseMeasInfoX);
+   if (gAsymAnaInfo->HasNormalBit())
+   {
+      // Add info to database entry
+      mseMeasInfoX->profile_ratio       = gAnaMeasResult->fProfilePolarR.first;
+      mseMeasInfoX->profile_ratio_error = gAnaMeasResult->fProfilePolarR.second;
 
-      gAsymRoot->FillDerived();
-      gAsymRoot->PostFill(*mseMeasInfoX);
+      mseMeasInfoX->polarization        = gAnaMeasResult->GetPCPolar().first;
+      mseMeasInfoX->polarization_error  = gAnaMeasResult->GetPCPolar().second;
+      mseMeasInfoX->phase               = gAnaMeasResult->GetPCPolarPhase().first;
+      mseMeasInfoX->phase_error         = gAnaMeasResult->GetPCPolarPhase().second;
    }
 
    // No data analysis is done beyond this point only bookkeeping

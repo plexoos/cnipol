@@ -21,7 +21,6 @@
 #include "CnipolPreprocHists.h"
 #include "CnipolProfileHists.h"
 #include "CnipolRawHists.h"
-#include "CnipolRawExtendedHists.h"
 #include "CnipolRunHists.h"
 #include "CnipolScalerHists.h"
 #include "CnipolSpinStudyHists.h"
@@ -151,6 +150,7 @@ void AsymRoot::CreateRootFile(string filename)
       oc  = new CnipolAlphaHists(dir);
       fHists->d["alpha"] = oc;
       fHistCuts[kCUT_PASSONE].insert(oc);
+      fHistCuts[kCUT_PASSTWO].insert(oc);
    }
 
    dir = new TDirectoryFile("calib", "calib", "", fOutRootFile);
@@ -169,31 +169,20 @@ void AsymRoot::CreateRootFile(string filename)
       fHists->d["scalers"] = new CnipolScalerHists(dir);
    }
 
-   if (gAsymAnaInfo->HasRawExtendedBit()) {
-      dir = new TDirectoryFile("raw", "raw", "", fOutRootFile);
-      oc  = new CnipolRawExtendedHists(dir);
-      fHists->d["raw"] = oc;
-      fHistCuts[kCUT_PASSONE].insert(oc);
-
-      dir = new TDirectoryFile("raw_eb", "raw_eb", "", fOutRootFile);
-      oc  = new CnipolRawExtendedHists(dir);
-      fHists->d["raw_eb"] = oc;
-      fHistCuts[kCUT_PASSONE_RAW_EB].insert(oc);
-
-      dir = new TDirectoryFile("raw_neb", "raw_neb", "", fOutRootFile);
-      oc  = new CnipolRawExtendedHists(dir);
-      fHists->d["raw_neb"] = oc;
-   }
-   else if (gAsymAnaInfo->HasRawBit()) {
+   if (gAsymAnaInfo->HasRawBit()) {
       dir = new TDirectoryFile("raw", "raw", "", fOutRootFile);
       oc  = new CnipolRawHists(dir);
       fHists->d["raw"] = oc;
       fHistCuts[kCUT_PASSONE].insert(oc);
+      fHistCuts[kCUT_PASSONE_PMT].insert(oc);
+      fHistCuts[kCUT_PASSONE_STEPPER].insert(oc);
 
       dir = new TDirectoryFile("raw_eb", "raw_eb", "", fOutRootFile);
       oc  = new CnipolRawHists(dir);
       fHists->d["raw_eb"] = oc;
       fHistCuts[kCUT_PASSONE_RAW_EB].insert(oc);
+      fHistCuts[kCUT_PASSONE_PMT].insert(oc);
+      fHistCuts[kCUT_PASSONE_STEPPER].insert(oc);
 
       dir = new TDirectoryFile("raw_neb", "raw_neb", "", fOutRootFile);
       oc  = new CnipolRawHists(dir);
@@ -417,7 +406,7 @@ void AsymRoot::FillDerived()
 
 
 /** */
-void AsymRoot::PostFill(MseMeasInfoX &run)
+void AsymRoot::PostFill()
 {
    Info("PostFill", "Called");
 
@@ -425,15 +414,6 @@ void AsymRoot::PostFill(MseMeasInfoX &run)
    // Some histograms may depend on other histograms in independent containers
    // For example, 'profile' depends on 'asym'
    fHists->PostFill();
-
-   // Add info to database entry
-   run.profile_ratio       = gAnaMeasResult->fProfilePolarR.first;
-   run.profile_ratio_error = gAnaMeasResult->fProfilePolarR.second;
-
-   run.polarization        = gAnaMeasResult->GetPCPolar().first;
-   run.polarization_error  = gAnaMeasResult->GetPCPolar().second;
-   run.phase               = gAnaMeasResult->GetPCPolarPhase().first;
-   run.phase_error         = gAnaMeasResult->GetPCPolarPhase().second;
 }
 
 

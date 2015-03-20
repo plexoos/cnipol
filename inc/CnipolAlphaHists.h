@@ -21,6 +21,7 @@ class CnipolAlphaHists : public DrawObjContainer
 public:
 
    static const double ALPHA_TDC_CUT;
+   std::set<int> bad_tdc_bins;
 
    CnipolAlphaHists();
    CnipolAlphaHists(TDirectory *dir);
@@ -30,6 +31,7 @@ public:
    void FillPassOne(ChannelEvent *ch);
    void PostFill();
    void PostFillPassOne(DrawObjContainer *oc=0);
+   void Fill(ChannelEvent *ch);
 
    ClassDef(CnipolAlphaHists, 1)
 };

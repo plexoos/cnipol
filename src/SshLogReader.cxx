@@ -30,8 +30,9 @@ string SshLogReader::GetSshCommand(const string &logger, const char *export_para
             " -timeformat 'unix'"
             " -showmissingdatawith x"
             " -timetolerance 0"
+            "%s"
             "%s\"",
-            logger.c_str(), export_params);
+            logger.c_str(), fAdditionalArgs.c_str(), export_params);
 
    return string(buf);
 }
@@ -91,13 +92,12 @@ string SshLogReader::ReadStream(FILE *fd)
    return string(buf, data_size);
 }
 
-
 vector<string> SshLogReader::ParseCellList(string line)
 {
    vector<string> result;
    char *copy = strdup(line.c_str());
-   assert(string(strtok(copy, " \t")) == "Time");
-   const char *tok;
+   const char *tok = strtok(copy, " \t");
+   assert(string(tok) == "Time");
    while ((tok = strtok(NULL, " \t")))
    {
       if (strlen(tok))
@@ -195,6 +195,13 @@ void SshLogReader::ExecuteCmd(string cmd, string *response)
       }
       if (retcode)
       {
+         if ((response->find("Can't find start time for event specified") != string::npos)
+             || (response->find("Can't find stop time for event specified") != string::npos))
+         {
+            gSystem->Error("SshLogReader", "event selector failed. Additional args: '%s'", fAdditionalArgs.c_str());
+            return;
+         }
+
          gSystem->Error("SshLogReader", "process returned %i", retcode);
          gSystem->Error("SshLogReader",
             "You need to create a gateway to acnlina machine.\n"

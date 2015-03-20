@@ -631,9 +631,14 @@ static void ProcessRecordATPassOne(const char *mSeek, RecordHeaderStruct *mHeade
                gAsymRoot->FillPassOne(kCUT_PASSONE_RAW_EB);
          }
 
-         if ( gAsymAnaInfo->HasPmtBit() && gAsymRoot->fChannelEvent->PassCutPmtChannel() )
+         if ( gAsymRoot->fChannelEvent->PassCutPmtChannel() )
          {
             gAsymRoot->FillPassOne(kCUT_PASSONE_PMT);
+         }
+
+         if ( gAsymRoot->fChannelEvent->PassCutStepperChannel() )
+         {
+            gAsymRoot->FillPassOne(kCUT_PASSONE_STEPPER);
          }
 
          if ( gAsymAnaInfo->HasStudiesBit() && gAsymRoot->fChannelEvent->IsSpinFlipperMarkerChannel() )
@@ -724,6 +729,11 @@ static void ProcessRecordATPassTwo(const char *mSeek, RecordHeaderStruct *mHeade
 
             if (gAsymRoot->fChannelEvent->PassCutCarbonMass())
 	            gAsymRoot->Fill(kCUT_CARBON);
+         }
+
+         if ( gAsymRoot->fChannelEvent->PassCutSiliconChannel() )
+         {
+            gAsymRoot->Fill(kCUT_PASSTWO);
          }
 
          if (gMeasInfo->fNEventsProcessed%50000 == 0)

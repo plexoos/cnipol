@@ -6,7 +6,7 @@ source /direct/eic+u/gwebb/pCpol/cnipol/script/setup.sh 15 > /dev/null
 
 CNIPOL_REMOTE_BLUE_DATA_DIR=/home/blue/20$RUN_ID/data
 CNIPOL_REMOTE_YELLOW_DATA_DIR=/home/yellow/20$RUN_ID/data
-CNIPOL_ONLINE_DIR=/usr/local/polarim/root
+CNIPOL_ONLINE_DIR=/home/cnipol/root
 RUNLIST=/eicdata/eic0005/runXX/lists/run${RUN_ID}_all
 
 while true;  do
@@ -31,10 +31,9 @@ while true;  do
 	    fi
 	    echo $CNIPOL_DIR/build/asym $args 
 	    $CNIPOL_DIR/build/asym $args
-	    rsync -a ${CNIPOL_RESULTS_DIR}/${run_name} gdwebb@pc2pc.phy.bnl.gov:${CNIPOL_ONLINE_DIR} > /dev/null
+	    rsync -av --exclude='*.root' ${CNIPOL_RESULTS_DIR}/${run_name} cnipol@pc2pc.phy.bnl.gov:${CNIPOL_ONLINE_DIR} > /dev/null
 	fi
     done
-    
     sleep ${CHECKINGPERIOD}
 
 done

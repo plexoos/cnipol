@@ -3,10 +3,13 @@
 #define AnaFillExternResult_h
 
 #include <map>
+#include <vector>
 #include <time.h>
 
 #include "TObject.h"
 #include "TGraphErrors.h"
+
+#include <opencdev.h>
 
 #include "AsymCommon.h"
 
@@ -30,19 +33,16 @@ protected:
    TGraphErrors *fYelRotCurPhenixGraph;
    TGraphErrors *fBluSnakeCurGraph;
    TGraphErrors *fYelSnakeCurGraph;
+   std::map< EPolarimeterId, std::vector<TGraphErrors*> > fBCCurGraph;
    time_t        fTimeEventLumiOn;
    time_t        fTimeEventLumiOff;
 
-public:
-
-protected:
-
-   void ReadInfo(std::ifstream &file);
+   TGraphErrors* MakeGraph(const std::map<opencdev::cdev_time_t, double> &values, int thin_out_factor=1);
+   void LoadInfo(UInt_t fillId);
 
 public:
 
-   AnaFillExternResult();
-   AnaFillExternResult(std::ifstream &file);
+   AnaFillExternResult(UInt_t fillId);
    ~AnaFillExternResult();
 
    TGraphErrors* GetGrBluIntens() const;

@@ -73,14 +73,14 @@ void CnipolRawHists::BookHists()
    hist->SetOption("colz LOGZ");
    o[shName] = hist;
 
-   shName = "hBunchCounts"; //former bunch_dist_raw
+   shName = "hBunchCounts";
    hist = new TH1I(shName.c_str(), shName.c_str(), N_BUNCHES, 0.5, N_BUNCHES+0.5);
    hist->SetTitle("; Bunch Id; Events;");
    hist->SetOption("hist XY GRIDX");
    hist->SetFillColor(kGray);
    o[shName] = hist;
 
-   shName = "hStripCounts"; // former strip_dist_raw
+   shName = "hStripCounts";
    hist = new TH1I(shName.c_str(), shName.c_str(), N_SILICON_CHANNELS, 0.5, N_SILICON_CHANNELS+0.5);
    hist->SetTitle("; Channel Id; Events;");
    hist->SetOption("hist XY GRIDX");
@@ -93,6 +93,7 @@ void CnipolRawHists::BookHists()
    hist->SetOption("hist GRIDX");
    hist->SetFillColor(kGray);
    o[shName] = hist;
+   fhWfdCounts = hist;
 
    shName = "hRevolutionId";
    hist = new TH1I(shName.c_str(), shName.c_str(), 1000, 0, 1);
@@ -101,8 +102,11 @@ void CnipolRawHists::BookHists()
    hist->SetBit(TH1::kCanRebin);
    o[shName] = hist;
 
-   //shName = "hsTvsACumul";
-   //o[shName] = new THStack(shName.c_str(), shName.c_str());
+   shName = "hChIdVsBunchId";
+   hist = new TH2I(shName.c_str(), shName.c_str(), N_BUNCHES, 0.5, N_BUNCHES+0.5, N_SILICON_CHANNELS, 0.5, N_SILICON_CHANNELS+0.5);
+   hist->SetTitle("; Bunch Id; Channel Id; ");
+   hist->SetOption("colz LOGZ");
+   o[shName] = hist;
 
    DrawObjContainer        *oc;
    DrawObjContainerMapIter  isubdir;
@@ -167,16 +171,19 @@ void CnipolRawHists::BookHists()
       oc->o[shName]      = hist;
       fhIvsA_ch[iChId-1] = hist;
 
-      //shName = "hTvsACumul_ch" + sChId;
-      //hist = new TH1F(shName.c_str(), shName.c_str(), 100, 0, 1);
-      //hist->SetOption("hist NOIMG");
-      //hist->SetTitle("; Digi Channel Frac; Event Frac;");
-      //hist->SetLineWidth(2);
-      //hist->SetLineColor(RunConfig::AsColor(iChId));
-      //hist->GetYaxis()->SetRangeUser(0, 1);
-      //oc->o[shName]           = hist;
-      //fhTvsACumul_ch[iChId-1] = hist;
-      //((THStack*) o["hsTvsACumul"])->Add(hist);
+      for (UShort_t iBunchId=1; iBunchId<=N_BUNCHES; iBunchId++)
+      {
+         string sBunchId("   ");
+         sprintf(&sBunchId[0], "%03d", iBunchId);
+
+         // bunched histograms start here
+         shName = "hTvsA_ch" + sChId + "_b" + sBunchId;
+         hist = new TH2S(shName.c_str(), shName.c_str(), 255, 0, 255, 80, 10, 90);
+         hist->SetOption("colz LOGZ NOIMG");
+         hist->SetTitle(";Amplitude, ADC;TDC;");
+         oc->o[shName] = hist;
+         fhTvsA_ch_b[iChId-1][iBunchId-1] = hist;
+      }
 
       // If this is a new directory then we need to add it to the list
       if ( isubdir == d.end()) {
@@ -189,40 +196,22 @@ void CnipolRawHists::BookHists()
 /** */
 void CnipolRawHists::FillPassOne(ChannelEvent *ch)
 {
-   UChar_t  chId     = ch->GetChannelId();
-   UShort_t adcA_bin = ch->GetAmpltd() + 1;
-   UShort_t adcI_bin = ch->GetIntgrl() + 1;
-   UShort_t tdc_bin  = ch->GetTdc() - 10 + 1; // 10 is the lowest edge of the TvsA histograms
+   UChar_t  chId = ch->GetChannelId();
+   UShort_t adcA = ch->GetAmpltd();
+   UShort_t adcI = ch->GetIntgrl();
+   UShort_t tdc  = ch->GetTdc();
+   UChar_t  bId  = ch->GetBunchId() + 1;
 
-   // Speed up the filling process by getting the global bin number
-   TH1*  hist;
-   Int_t gbin;
+   if (ch->PassCutSiliconChannel()) {
+      fhTvsA_ch_b[chId-1][bId-1]->Fill(adcA, tdc);
+      fhTvsI_ch[chId-1]->Fill(adcI, tdc);
+      fhIvsA_ch[chId-1]->Fill(adcA, adcI);
+      ((TH1*) o["hRevolutionId"])->Fill(ch->GetRevolutionId());
+   }
 
-   hist = fhTvsA_ch[chId-1];
-   gbin = hist->GetBin(adcA_bin, tdc_bin);
-   hist->AddBinContent(gbin);
-   hist->SetEntries(hist->GetEntries()+1);
-
-   hist = fhTvsI_ch[chId-1];
-   gbin = hist->GetBin(adcI_bin, tdc_bin);
-   hist->AddBinContent(gbin);
-   hist->SetEntries(hist->GetEntries()+1);
-
-   hist = fhIvsA_ch[chId-1];
-   gbin = hist->GetBin(adcA_bin, adcI_bin);
-   hist->AddBinContent(gbin);
-   hist->SetEntries(hist->GetEntries()+1);
-
-   hist = (TH1*) o["hBunchCounts"];
-   hist->AddBinContent(ch->GetBunchId() + 1);
-   hist->SetEntries(hist->GetEntries()+1);
-
-   hist = ((TH1*) o["hStripCounts"]);
-   hist->AddBinContent(chId);
-   hist->SetEntries(hist->GetEntries()+1);
-
-   hist = ((TH1*) o["hRevolutionId"]);
-   hist->Fill(ch->GetRevolutionId());
+   if (gCh2WfdMap) {
+      fhWfdCounts->Fill(gCh2WfdMap[chId-1]);
+   }
 }
 
 
@@ -230,6 +219,31 @@ void CnipolRawHists::FillPassOne(ChannelEvent *ch)
 void CnipolRawHists::FillDerivedPassOne()
 {
    Info("FillDerivedPassOne()", "Called");
+
+   for (UShort_t iCh=1; iCh<=N_SILICON_CHANNELS; iCh++)
+   {
+      TH1* hTvsA_ch = (TH1*) fhTvsA_ch[iCh-1];
+
+      for (UShort_t iBunchId=1; iBunchId<=N_BUNCHES; iBunchId++)
+      {
+         TH2* hTvsA_ch_b = (TH2*) fhTvsA_ch_b[iCh-1][iBunchId-1];
+
+         hTvsA_ch->Add(hTvsA_ch_b);
+
+         Double_t nEntries = hTvsA_ch_b->GetEntries();
+         ((TH2I*) o["hChIdVsBunchId"])->SetBinContent(iBunchId, iCh, nEntries);
+         ((TH2I*) o["hChIdVsBunchId"])->SetEntries(((TH2I*) o["hChIdVsBunchId"])->GetEntries() + nEntries);
+
+         TH1* hist = ((TH1*) o["hBunchCounts"]);
+         hist->AddBinContent(iBunchId, nEntries);
+         hist->SetEntries(hist->GetEntries()+nEntries);
+
+         //utils::ConvertToCumulative2(hTvsA_ch_b, (TH1F*) fhTvsACumul_ch_b[iCh-1][iBunchId-1]);
+      }
+
+      ((TH1I*) o["hStripCounts"])->SetBinContent(iCh, hTvsA_ch->GetEntries());
+      ((TH1I*) o["hStripCounts"])->SetEntries(((TH1I*) o["hStripCounts"])->GetEntries() + hTvsA_ch->GetEntries());
+   }
 
    TH1* hAdcAmpltd = (TH1*) o["hAdcAmpltd"];
    TH1* hAdcIntgrl = (TH1*) o["hAdcIntgrl"];
@@ -281,14 +295,6 @@ void CnipolRawHists::FillDerivedPassOne()
       utils::CopyBinContentError(hProjTmp, hTdc_channel);
 
       hTdc->Add(hTdc_channel);
-
-      // Calculate cumulative histograms
-      //utils::ConvertToCumulative2(hTvsA_ch, (TH1F*) fhTvsACumul_ch[iCh-1]);
-
-      if (!gCh2WfdMap) continue;
-
-      ((TH1I*) o["hWfdCounts"])->AddBinContent(gCh2WfdMap[iCh-1], hTvsA_ch->GetEntries());
-      ((TH1I*) o["hWfdCounts"])->SetEntries(((TH1I*) o["hWfdCounts"])->GetEntries() + hTvsA_ch->GetEntries());
    }
 }
 

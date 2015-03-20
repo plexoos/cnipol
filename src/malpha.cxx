@@ -20,6 +20,7 @@
 #include "AsymHeader.h"
 #include "MeasInfo.h"
 #include "BiasCurrentUtil.h"
+#include "RunConfig.h"
 
 #include "DrawObjContainer.h"
 
@@ -49,8 +50,11 @@ void FillFromHist(TH1F *h, double startTime, ResultMean &result, ResultMean &res
 
    TFitResultPtr fitres = h->Fit("pol0", "QS"); // Q: quiet, S: return fitres
 
-   result.first[startTime] = fitres->Value(0);
-   result_err.first[startTime] = fitres->FitResult::Error(0);
+   if (fitres.Get())
+   {
+      result.first[startTime] = fitres->Value(0);
+      result_err.first[startTime] = fitres->FitResult::Error(0);
+   }
 
    result.second[startTime].resize(N_DETECTORS);
    result_err.second[startTime].resize(N_DETECTORS);
@@ -110,17 +114,6 @@ void FillDeviceMaxMin(map<Short_t, ResultMean> &results)
       result.min_value = min_value;
       result.max_value = max_value;
    }
-}
-
-
-Color_t GetLineColor(int det)
-{
-   Color_t  line_color = det + 2;
-   if (line_color == 5)
-   {
-      line_color = 28;
-   }
-   return line_color;
 }
 
 
@@ -190,7 +183,7 @@ void PlotMean(DrawObjContainer *oc, const char *name, ResultMean &result, Result
          hname += (det + 1);
          hdet = new TH1F(hname, hname, 100, result.min_value, result.max_value);
          hdet->SetXTitle(h->GetYaxis()->GetTitle());
-         hdet->SetLineColor(GetLineColor(det));
+         hdet->SetLineColor(RunConfig::DetAsColor(det));
          for (map< Time, vector<double> >::iterator it = result.second.begin(); it != result.second.end(); it++)
          {
             double value = it->second[det];
@@ -240,7 +233,7 @@ void PlotMean(DrawObjContainer *oc, const char *name, ResultMean &result, Result
 
       TGraphErrors *g = new TGraphErrors(result.second.size());
       TGraphErrors *det_g = new TGraphErrors(result.second.size());
-      Color_t line_color = GetLineColor(det);
+      Color_t line_color = RunConfig::DetAsColor(det);
       g->SetLineColor(line_color);
       g->SetMarkerColor(line_color);
       g->SetMarkerStyle(20);
@@ -376,12 +369,7 @@ void PlotCorrelation(DrawObjContainer *oc, const char *name, ResultMean &r1, Res
    {
       int	i = 0;
       TGraphErrors *g = new TGraphErrors(r1.second.size());
-      Color_t  line_color = det + 2;
-      if (line_color == 5)
-      {
-         line_color = 28;
-      }
-      g->SetMarkerColor(line_color);
+      g->SetMarkerColor(RunConfig::DetAsColor(det));
 
       for (map< Time, vector<double> >::iterator it = r1.second.begin(); it != r1.second.end(); it++)
       {

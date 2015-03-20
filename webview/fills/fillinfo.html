@@ -38,7 +38,7 @@ $gP = new PlotHelper($dir);
 
 
 <p>
-<a href="http://www.phy.bnl.gov/cnipol/rundb/?&rp=<?=$_GET['rp']?>&rn=<?=$gFillId?>%" class="s150">List of measurements</a>
+<a href="../rundb/?&rp=<?=$_GET['rp']?>&rn=<?=$gFillId?>%" class="s150">List of measurements</a>
 
 
 
@@ -86,27 +86,6 @@ Asymmetry per bunch averaged over all p-Carbon measurements taken between the lu
 </div>
 
 <?//endif;  ?>
-
-
-<tr>
-<td>
-   <?=$gP->img("hExternInfoVsFillTime_{$gFillId}", false, 500)?>
-<div class="thumbcaption">
-Snake and rotator currents for STAR and PHENIX
-</div>
-
-<td>
-<table class="simple00">
-<tr>
-<td>
-   <?=$gP->img("hIntensVsFillTime_{$gFillId}_BLU", false, 500)?>
-   <div class="thumbcaption_cm"> <span class='bluPol'>Blue</span> </div>
-<td>
-   <?=$gP->img("hIntensVsFillTime_{$gFillId}_YEL", false, 500)?>
-   <div class="thumbcaption_cm"> <span class='yelPol'>Yellow</span> </div>
-</table>
-<div class="thumbcaption"> Beam intensity between the lumi-on and lumi-off events </div>
-
 
 <tr>
 <td>
@@ -159,6 +138,71 @@ Snake and rotator currents for STAR and PHENIX
 
 </table>
 
+
+</div>
+<!-- }}} -->
+
+<h1 id="cdev_logs" class="count">CDEV Logs</h1>
+<!-- {{{ -->
+<div id="div:cdev_logs" class="section">
+
+<h2 id="rhic" class="count">RHIC</h2>
+<!-- {{{ -->
+<div id="div:rhic" class="section">
+
+<table class="simple00 cntr" cellspacing=15 align=center>
+<tr>
+<td>
+   <?=$gP->img("hExternInfoVsFillTime_{$gFillId}", false, 500)?>
+<div class="thumbcaption">
+Snake and rotator currents for STAR and PHENIX
+</div>
+
+<td>
+<table class="simple00">
+<tr>
+<td>
+   <?=$gP->img("hIntensVsFillTime_{$gFillId}_BLU", false, 500)?>
+   <div class="thumbcaption_cm"> <span class='bluPol'>Blue</span> </div>
+<td>
+   <?=$gP->img("hIntensVsFillTime_{$gFillId}_YEL", false, 500)?>
+   <div class="thumbcaption_cm"> <span class='yelPol'>Yellow</span> </div>
+</table>
+<div class="thumbcaption"> Beam intensity between the lumi-on and lumi-off events </div>
+</tr>
+</table>
+</div>
+<!-- }}} -->
+
+<h2 id="bias_current" class="count">Bias current</h2>
+<!-- {{{ -->
+<div id="div:bias_current" class="section">
+
+<table class="simple00 cntr" cellspacing=15 align=center>
+<tr>
+<td>
+<table class="simple00">
+<tr>
+<td>
+   <?=$gP->img("hBCVsFillTime_{$gFillId}_B1U", false, 500)?>
+   <div class="thumbcaption_cm"> <span class='bluPol'>B1U</span> </div>
+<td>
+   <?=$gP->img("hBCVsFillTime_{$gFillId}_Y2U", false, 500)?>
+   <div class="thumbcaption_cm"> <span class='yelPol'>Y2U</span> </div>
+
+<tr>
+<td>
+   <?=$gP->img("hBCVsFillTime_{$gFillId}_B2D", false, 500)?>
+   <div class="thumbcaption_cm"> <span class='bluPol'>B2D</span> </div>
+<td>
+   <?=$gP->img("hBCVsFillTime_{$gFillId}_Y1D", false, 500)?>
+   <div class="thumbcaption_cm"> <span class='yelPol'>Y1D</span> </div>
+
+</table>
+</tr>
+</table>
+</div>
+<!-- }}} -->
 
 </div>
 <!-- }}} -->

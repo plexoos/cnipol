@@ -1,5 +1,9 @@
 # vim: set noexpandtab:
 
+INCLUDE_DIRECTORIES(
+	${OPENCDEV_INCLUDE_DIR}
+	)
+
 ROOT_GENERATE_DICTIONARY(
 	Dict
 	${LINKDEF_DEPENDENCIES}
@@ -10,7 +14,6 @@ INCLUDE_DIRECTORIES(
 	${ROOT_INCLUDE_DIR}
 	${MYSQL++_INCLUDE_DIR}
 	${SQLITE3_INCLUDE_DIR}
-	${OPENCDEV_INCLUDE_DIR}
 	)
 
 ADD_LIBRARY(
@@ -53,7 +56,6 @@ ADD_LIBRARY(
 	CnipolProfileHists.cxx
 	CnipolProfileHists.cxx
 	CnipolPulserHists.cxx
-	CnipolRawExtendedHists.cxx
 	CnipolRawHists.cxx
 	CnipolRunHists.cxx
 	CnipolScalerHists.cxx

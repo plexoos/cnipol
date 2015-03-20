@@ -101,10 +101,11 @@ $asymVersionLink = "<a href=https://wiki.bnl.gov/rhicspin/Asym_versions#$asymVer
    <td>
    <b>Run Start Time:</b> <?=isset($rc['start_time']) ? date("M d, Y H:i:s D", $rc['start_time']) : "&nbsp;";?>
    <td>
+   <b>Duration:</b> <?=($rc['fStartTime'] < $rc['fStopTime']) ? ($rc['fStopTime'] - $rc['fStartTime']) : "?";?> seconds
+   <td>
    <b>Total Events:</b> <?=number_format($rc['fNEventsTotal'])?>
    <td>
    <b>Beam Energy:</b> &mdash;
-   <td>&nbsp;
    <!--
    <td>
    <b>Size:</b> <?//=$s['dirsize']?>
@@ -115,11 +116,11 @@ $asymVersionLink = "<a href=https://wiki.bnl.gov/rhicspin/Asym_versions#$asymVer
    <!--<b>Run End Time:</b> <?//=date("M j, Y H:i:s", $rc['StopTime'])?>-->
    <b>Processed Offline:</b> <?=date("M j, Y H:i:s", $rc['ana_start_time'])?>&nbsp;
    (<?=sprintf("%.0f", $rc['ana_duration']);?>&nbsp;s)
+   <td>&nbsp;
    <td>
    <b>Events Processed:</b> <?=number_format($rc['fNEventsProcessed'])?>
-   <? if ($rc['thinout'] > 1): ?>(every <?=ordinal_suffix($rc['thinout'])?> event)
-   <? endif; ?>
-   <td>&nbsp;
+   <?php if ($rc['thinout'] > 1): ?>(every <?=ordinal_suffix($rc['thinout'])?> event)
+   <?php endif; ?>
    <td>
    <b>Asym Version:</b> <?=$asymVersionLink?>
 
@@ -206,17 +207,21 @@ endfor;
 
 <p>
 
+<?php
+$newstyle_gain_plots = ($rc['fAnaDateTime'] >= 1388534400); // 00:00:00 01/01/2014
+?>
+
 <table class="simple00 cntr" cellspacing=15 align=center>
 
 <tr class="toprow2">
 <td>
-<?=$gP->img('alpha/hAmGain')?>
+<?=$newstyle_gain_plots ? $gP->img('alpha/hAmGain') : $gP->img('alpha/hAmAmpCoef')?>
 <div class="thumbcaption">
 Calibration constants calculated using the <b>amplitude</b> (A) in the maximum of the signal shape
 </div>
 
 <td>
-<?=$gP->img('alpha/hAmIntGain')?>
+<?=$newstyle_gain_plots ? $gP->img('alpha/hAmIntGain') : $gP->img('alpha/hAmIntCoef')?>
 <div class="thumbcaption">
 Calibration constants calculated using the <b>integral</b> (I) of the signal shape
 </div>
@@ -243,14 +248,14 @@ Calibration constants calculated using the <b>integral</b> (I) of the signal sha
 <?=$gP->img('alpha/hAmpltd')?>
 <td align=center>
 <td align=center>
-<?=$gP->img('alpha/hAmGainWidth')?>
+<?=$newstyle_gain_plots ? $gP->img('alpha/hAmGainWidth') : $gP->img('alpha/hAmAmpWidth')?>
 
 <tr>
 <td align=center>
 <?=$gP->img('alpha/hIntgrl')?>
 <td align=center>
 <td align=center>
-<?=$gP->img('alpha/hAmIntGainWidth')?>
+<?=$newstyle_gain_plots ? $gP->img('alpha/hAmIntGainWidth') : $gP->img('alpha/hAmIntWidth')?>
 
 <tr>
 <td align=center colspan=3>
@@ -301,7 +306,7 @@ foreach($rc['fSiliconChannels'] as $chanId) {
 
    $img = $gP->img("hAmpltd_ch$chanId", false, 250);
    print "<td>$img\n";
-   print "channel $chanId\n";
+   print "<a href=./?runid=$gRunId&chanid=$chanId>channel $chanId</a>\n";
    
 }
 ?>

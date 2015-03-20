@@ -44,7 +44,7 @@ void CnipolAlphaHists::BookHists()
    //o["hAmpltd"] = new TH1F("hAmpltd", "hAmpltd", 35, 165, 200);
 
    // The axis range will be/can be adjusted later based on the peak position
-   o["hAmpltd"] = new TH1F("hAmpltd", "hAmpltd", 255, 0, 255);
+   o["hAmpltd"] = new TH1F("hAmpltd", "hAmpltd", 220, 0, 220);
    ((TH1*) o["hAmpltd"])->SetTitle("; Amplitude, ADC; Events; ");
 
    o["hIntgrl"] = new TH1F("hIntgrl", "hIntgrl", 255, 0, 255);
@@ -56,7 +56,7 @@ void CnipolAlphaHists::BookHists()
    o["hTdc"]    = new TH1F("hTdc", "hTdc",  80, 0, 80);
    ((TH1*) o["hTdc"])->SetTitle("; TDC; Events; ");
 
-   o["hTvsA"] = new TH2F("hTvsA",   "hTvsA", 255, 0, 255, 80, 0, 80);
+   o["hTvsA"] = new TH2F("hTvsA",   "hTvsA", 220, 0, 220, 80, 0, 80);
    ((TH1*) o["hTvsA"])->SetOption("colz LOGZ");
    ((TH1*) o["hTvsA"])->SetTitle("; Amplitude, ADC; TDC;");
 
@@ -65,7 +65,7 @@ void CnipolAlphaHists::BookHists()
    ((TH2F*) o["hTvsI"])->GetXaxis()->SetTitle("Integral, ADC");
    ((TH2F*) o["hTvsI"])->GetYaxis()->SetTitle("TDC");
 
-   o["hIvsA"]        = new TH2F("hIvsA",   "hIvsA", 255, 0, 255, 255, 0, 255);
+   o["hIvsA"]        = new TH2F("hIvsA",   "hIvsA", 220, 0, 220, 255, 0, 255);
    ((TH2F*) o["hIvsA"])->SetOption("colz LOGZ");
    ((TH2F*) o["hIvsA"])->GetXaxis()->SetTitle("Amplitude, ADC");
    ((TH2F*) o["hIvsA"])->GetYaxis()->SetTitle("Integral, ADC");
@@ -142,66 +142,6 @@ void CnipolAlphaHists::BookHists()
    ((TH1F*) o["hDeadLayerEnergy"])->SetOption("E1 GRIDX GRIDY");
 
 
-   o["Detector1_Events"]   = new TH1F("Detector1_Events", "Detector1_Events", 12, 1, 12);
-   ((TH1*) o["Detector1_Events"])->SetOption("E1 NOIMG");
-   ((TH1*) o["Detector1_Events"])->GetXaxis()->SetTitle("Channel");
-   ((TH1*) o["Detector1_Events"])->GetYaxis()->SetTitle("# of Events");
-
-   o["Detector2_Events"]   = new TH1F("Detector2_Events", "Detector2_Events", 12, 13, 24);
-   ((TH1*) o["Detector2_Events"])->SetOption("E1 NOIMG");
-   ((TH1*) o["Detector2_Events"])->GetXaxis()->SetTitle("Channel");
-   ((TH1*) o["Detector2_Events"])->GetYaxis()->SetTitle("# of Events");
-
-   o["Detector3_Events"]   = new TH1F("Detector3_Events", "Detector3_Events", 12, 25, 36);
-   ((TH1*) o["Detector3_Events"])->SetOption("E1 NOIMG");
-   ((TH1*) o["Detector3_Events"])->GetXaxis()->SetTitle("Channel");
-   ((TH1*) o["Detector3_Events"])->GetYaxis()->SetTitle("# of Events");
-
-   o["Detector4_Events"]   = new TH1F("Detector4_Events", "Detector4_Events", 12, 37, 48);
-   ((TH1*) o["Detector4_Events"])->SetOption("E1 NOIMG");
-   ((TH1*) o["Detector4_Events"])->GetXaxis()->SetTitle("Channel");
-   ((TH1*) o["Detector4_Events"])->GetYaxis()->SetTitle("# of Events");
-
-   o["Detector5_Events"]   = new TH1F("Detector5_Events", "Detector5_Events", 12, 49, 60);
-   ((TH1*) o["Detector5_Events"])->SetOption("E1 NOIMG");
-   ((TH1*) o["Detector5_Events"])->GetXaxis()->SetTitle("Channel");
-   ((TH1*) o["Detector5_Events"])->GetYaxis()->SetTitle("# of Events");
-
-   o["Detector6_Events"]   = new TH1F("Detector6_Events", "Detector6_Events", 12, 61, 72);
-   ((TH1*) o["Detector6_Events"])->SetOption("E1 NOIMG");
-   ((TH1*) o["Detector6_Events"])->GetXaxis()->SetTitle("Channel");
-   ((TH1*) o["Detector6_Events"])->GetYaxis()->SetTitle("# of Events");
-
-   o["Detector1_Events_Dsp"]   = new TH1F("Detector1_Events_Dsp", "Detector1_Events_Dsp", 20000, 0, 20000);
-   ((TH1*) o["Detector1_Events_Dsp"])->SetOption("E1 NOIMG");
-   ((TH1*) o["Detector1_Events_Dsp"])->GetXaxis()->SetTitle("Events");
-   ((TH1*) o["Detector1_Events_Dsp"])->GetYaxis()->SetTitle("#");
-
-   o["Detector2_Events_Dsp"]   = new TH1F("Detector2_Events_Dsp", "Detector2_Events_Dsp", 20000, 0, 20000);
-   ((TH1*) o["Detector2_Events_Dsp"])->SetOption("E1 NOIMG");
-   ((TH1*) o["Detector2_Events_Dsp"])->GetXaxis()->SetTitle("Events");
-   ((TH1*) o["Detector2_Events_Dsp"])->GetYaxis()->SetTitle("#");
-
-   o["Detector3_Events_Dsp"]   = new TH1F("Detector3_Events_Dsp", "Detector3_Events_Dsp", 20000, 0, 20000);
-   ((TH1*) o["Detector3_Events_Dsp"])->SetOption("E1 NOIMG");
-   ((TH1*) o["Detector3_Events_Dsp"])->GetXaxis()->SetTitle("Events");
-   ((TH1*) o["Detector3_Events_Dsp"])->GetYaxis()->SetTitle("#");
-
-   o["Detector4_Events_Dsp"]   = new TH1F("Detector4_Events_Dsp", "Detector4_Events_Dsp", 20000, 0, 20000);
-   ((TH1*) o["Detector4_Events_Dsp"])->SetOption("E1 NOIMG");
-   ((TH1*) o["Detector4_Events_Dsp"])->GetXaxis()->SetTitle("Events");
-   ((TH1*) o["Detector4_Events_Dsp"])->GetYaxis()->SetTitle("#");
-
-   o["Detector5_Events_Dsp"]   = new TH1F("Detector5_Events_Dsp", "Detector5_Events_Dsp", 20000, 0, 20000);
-   ((TH1*) o["Detector5_Events_Dsp"])->SetOption("E1 NOIMG");
-   ((TH1*) o["Detector5_Events_Dsp"])->GetXaxis()->SetTitle("Events");
-   ((TH1*) o["Detector5_Events_Dsp"])->GetYaxis()->SetTitle("#");
-
-   o["Detector6_Events_Dsp"]   = new TH1F("Detector6_Events_Dsp", "Detector6_Events_Dsp", 20000, 0, 20000);
-   ((TH1*) o["Detector6_Events_Dsp"])->SetOption("E1 NOIMG");
-   ((TH1*) o["Detector6_Events_Dsp"])->GetXaxis()->SetTitle("Events");
-   ((TH1*) o["Detector6_Events_Dsp"])->GetYaxis()->SetTitle("#");
-
    DrawObjContainer        *oc;
    DrawObjContainerMapIter  isubdir;
 
@@ -232,7 +172,7 @@ void CnipolAlphaHists::BookHists()
       //( (TH1F*) feedback.o[hName]) -> SetLineColor(2);
 
       sprintf(hName, "hAmpltd_ch%02d", iCh);
-      oc->o[hName] = new TH1F(hName, hName, 255, 0, 255);
+      oc->o[hName] = new TH1F(hName, hName, 220, 0, 220);
       ((TH1*) oc->o[hName])->SetTitle("; Amplitude, ADC; Events; ");
 
       sprintf(hName, "hIntgrl_ch%02d", iCh);
@@ -244,7 +184,7 @@ void CnipolAlphaHists::BookHists()
       ((TH1*) oc->o[hName])->SetTitle("; TDC; Events; ");
 
       sprintf(hName, "hTvsA_ch%02d", iCh);
-      oc->o[hName] = new TH2F(hName, hName, 255, 0, 255, 80, 0, 80);
+      oc->o[hName] = new TH2F(hName, hName, 220, 0, 220, 80, 0, 80);
       ((TH1*) oc->o[hName])->SetOption("colz LOGZ");
       ((TH1*) oc->o[hName])->SetTitle("; Amplitude, ADC; TDC;");
 
@@ -259,7 +199,7 @@ void CnipolAlphaHists::BookHists()
       ((TH1*) oc->o[hName])->SetTitle("; Integral, ADC; TDC; ");
 
       sprintf(hName, "hIvsA_ch%02d", iCh);
-      oc->o[hName] = new TH2F(hName, hName, 255, 0, 255, 255, 0, 255);
+      oc->o[hName] = new TH2F(hName, hName, 220, 0, 220, 255, 0, 255);
       ((TH1*) oc->o[hName])->SetOption("colz LOGZ");
       ((TH1*) oc->o[hName])->SetTitle("; Amplitude, ADC; Integral, ADC; ");
 
@@ -296,8 +236,47 @@ void CnipolAlphaHists::FillPassOne(ChannelEvent *ch)
    ((TH2F*) sd->o["hTvsA_ch"      + sSi])->Fill(data.fAmpltd, data.fTdc);
    ((TH2F*) sd->o["hTvsA_zoom_ch" + sSi])->Fill(data.fAmpltd, data.fTdc);
    ((TH2F*) sd->o["hTvsI_ch"      + sSi])->Fill(data.fIntgrl, data.fTdc);
+}
 
-   if (data.fTdc <= ALPHA_TDC_CUT)
+
+/** */
+void CnipolAlphaHists::PostFillPassOne(DrawObjContainer *oc)
+{
+   Info("PostFillPassOne", "Called");
+
+   // determine TDC distribution baseline
+   TH1F *hTdc = (TH1F*)o["hTdc"];
+   double baseline = utils::find_baseline(hTdc, 0.5);
+   TF1 *f = new TF1("pol0", "[0]", hTdc->GetXaxis()->GetXmin(), hTdc->GetXaxis()->GetXmax());
+   f->SetParameter(0, baseline);
+   hTdc->GetListOfFunctions()->Add(f);
+
+   // Mark outliers
+   Int_t xfirst = hTdc->GetXaxis()->GetFirst();
+   Int_t xlast  = hTdc->GetXaxis()->GetLast();
+   for (Int_t bin = xfirst; bin <= xlast; bin++) {
+      double value = hTdc->GetBinContent(bin);
+      if (value > baseline*2) {
+         Info("PostFillPassOne", "bad TDC bin %i", bin);
+         bad_tdc_bins.insert(bin - 1);
+         bad_tdc_bins.insert(bin);
+         bad_tdc_bins.insert(bin + 1);
+      }
+   }
+}
+
+
+/** */
+void CnipolAlphaHists::Fill(ChannelEvent *ch)
+{
+   UChar_t      chId = ch->GetChannelId();
+   ChannelData &data = ch->fChannel;
+
+   string sSi("  ");
+   sprintf(&sSi[0], "%02d", chId);
+   DrawObjContainer *sd = d["channel" + sSi];
+
+   if ((data.fTdc <= ALPHA_TDC_CUT) && !bad_tdc_bins.count(data.fTdc))
    {
       ((TH1F*) o["hAmpltd"])->Fill(data.fAmpltd);
       ((TH1F*) o["hIntgrl"])->Fill(data.fIntgrl);
@@ -312,13 +291,7 @@ void CnipolAlphaHists::FillPassOne(ChannelEvent *ch)
 /** */
 void CnipolAlphaHists::PostFill()
 {
-}
-
-
-/** */
-void CnipolAlphaHists::PostFillPassOne(DrawObjContainer *oc)
-{
-   Info("PostFillPassOne", "Called");
+   Info("PostFill", "Called");
 
    // Adjust axis ranges
    Int_t    maxBinA = ((TH1F*) o["hAmpltd"])->GetMaximumBin();
@@ -349,21 +322,44 @@ void CnipolAlphaHists::PostFillPassOne(DrawObjContainer *oc)
    utils::UpdateLimits((TH1*) o["hGdIntGain"]);
    utils::UpdateLimits((TH1*) o["hGdIntGainWidth"]);
 
-   // Visualize the TDC cut
+   // Visualize the TDC cuts
    TVirtualPad *backup = gPad;
-   TH2F *h;
    TLine *l;
-   h = (TH2F*)o["hTvsA"];
+   TH2F *hTvsA = (TH2F*)o["hTvsA"];
    o["hTvsA"] = new TCanvas("hTvsA", "");
-   h->Draw();
+   hTvsA->Draw();
    l = new TLine(0, ALPHA_TDC_CUT, 255, ALPHA_TDC_CUT);
    l->SetLineWidth(3);
    l->Draw();
-   h = (TH2F*)o["hTvsI"];
+   TH2F *hTvsI = (TH2F*)o["hTvsI"];
    o["hTvsI"] = new TCanvas("hTvsI", "");
-   h->Draw();
+   hTvsI->Draw();
    l = new TLine(0, ALPHA_TDC_CUT, 255, ALPHA_TDC_CUT);
    l->SetLineWidth(3);
    l->Draw();
+   for(set<int>::const_iterator it = bad_tdc_bins.begin(); it != bad_tdc_bins.end(); it++)
+   {
+      const Style_t FILL_STYLE = 3013;
+      const Color_t FILL_COLOR = kBlack;
+      int bin = *it;
+      double up, low;
+      TBox *b;
+
+      ((TCanvas*) o["hTvsA"])->cd();
+      low = hTvsA->GetXaxis()->GetBinLowEdge(bin);
+      up = hTvsA->GetXaxis()->GetBinUpEdge(bin);
+      b = new TBox(hTvsA->GetXaxis()->GetXmin(), low, hTvsA->GetXaxis()->GetXmax(), up);
+      b->SetFillStyle(FILL_STYLE);
+      b->SetFillColor(FILL_COLOR);
+      b->Draw();
+
+      ((TCanvas*) o["hTvsI"])->cd();
+      low = hTvsI->GetXaxis()->GetBinLowEdge(bin);
+      up = hTvsI->GetXaxis()->GetBinUpEdge(bin);
+      b = new TBox(hTvsI->GetXaxis()->GetXmin(), low, hTvsI->GetXaxis()->GetXmax(), up);
+      b->SetFillStyle(FILL_STYLE);
+      b->SetFillColor(FILL_COLOR);
+      b->Draw();
+   }
    gPad = backup;
 }

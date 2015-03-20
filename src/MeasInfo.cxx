@@ -502,8 +502,11 @@ void MeasInfo::Update(MseMeasInfoX& run)
       fRunId = 11;
    } else if (RUNID >= 16000 && RUNID < 16800) { // Run 12
       fRunId = 12;
-   } else if (RUNID >= 17000 ) { // Run 13
+   } else if (RUNID >= 17000 && RUNID < 18000) { // Run 13
       fRunId = 13;
+      gCh2WfdMap = ch2WfdMap_run13;
+   } else if (RUNID >= 18000) {
+      fRunId = 15;
       gCh2WfdMap = ch2WfdMap_run13;
    } else {
       // default Run value
@@ -715,11 +718,9 @@ UShort_t MeasInfo::GetNumActiveSiChannels() const
 
 
 /** */
-Bool_t MeasInfo::IsHamaChannel(UShort_t chId)
+Bool_t MeasInfo::IsPmtChannel(UShort_t chId) const
 {
-   if ( ( (EPolarimeterId) fPolId == kB2D || (EPolarimeterId) fPolId == kY1D) &&
-        ( (chId >= 13 && chId <= 24) || (chId >= 49 && chId <= 60) )
-      )
+   if ( chId > N_SILICON_CHANNELS && chId <= N_SILICON_CHANNELS+4 )
       return true;
 
    return false;
@@ -727,13 +728,9 @@ Bool_t MeasInfo::IsHamaChannel(UShort_t chId)
 
 
 /** */
-Bool_t MeasInfo::IsPmtChannel(UShort_t chId) const
+Bool_t MeasInfo::IsStepperChannel(UShort_t chId) const
 {
-   if ( ((EPolarimeterId) fPolId == kY2U || (EPolarimeterId) fPolId == kY1D) &&
-        chId > N_SILICON_CHANNELS && chId <= N_SILICON_CHANNELS+4 )
-      return true;
-
-   return false;
+   return (chId > N_SILICON_CHANNELS+4) && (chId <= N_SILICON_CHANNELS+8);
 }
 
 

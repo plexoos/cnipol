@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
       // the cut on polarization value should be removed
       //if (polarization > 99 || polarizationErr > 30 ||
       if (polarization < 10 || polarization > 99 || polarizationErr > 30 ||
-          gRunConfig.fBeamEnergies.find(beamEnergy) == gRunConfig.fBeamEnergies.end() ||
+	  //  gRunConfig.fBeamEnergies.find(beamEnergy) == gRunConfig.fBeamEnergies.end() ||
           gMM->fMeasInfo->fMeasType != kMEASTYPE_SWEEP ||
           (TMath::Abs(profileRatio) > 5.000) ||                             // exclude very large values
           (TMath::Abs(profileRatio) > 1.000 && profileRatioErr < 0.05) ||   // exclude large values with small errors
@@ -204,13 +204,13 @@ int main(int argc, char *argv[])
       anaGlobResult.UpdateInsertDb(asymDbSql);
       asymDbSql.CloseConnection();
    }
-
+   Info("masym", "HERE I AM3...");
    gH->Write();
 
    mAsymRoot.Print();
    mAsymRoot.Close();
 
-   anaGlobResult.Print();
+   //   anaGlobResult.Print();
 
    return EXIT_SUCCESS;
 }
