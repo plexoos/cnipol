@@ -1,3 +1,0 @@
-nohup ./script/run.sh ../runXX/lists/run11_e250_
-nohup ./script/run.sh ../runXX/lists/run12_e100_
-nohup ./script/run.sh ../runXX/lists/run12_e255_
