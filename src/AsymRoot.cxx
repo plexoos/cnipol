@@ -153,10 +153,10 @@ void AsymRoot::CreateRootFile(string filename)
       fHistCuts[kCUT_PASSTWO].insert(oc);
    }
 
-   dir = new TDirectoryFile("calib", "calib", "", fOutRootFile);
-   fHists->d["calib"] = new CnipolCalibHists(dir);
-
    if (gAsymAnaInfo->HasNormalBit()) {
+      dir = new TDirectoryFile("calib", "calib", "", fOutRootFile);
+      fHists->d["calib"] = new CnipolCalibHists(dir);
+
       dir = new TDirectoryFile("std", "std", "", fOutRootFile);
       oc  = new CnipolHists(dir);
       fHists->d["std"] = oc;
@@ -226,7 +226,7 @@ void AsymRoot::CreateRootFile(string filename)
       dir = new TDirectoryFile("pmt", "pmt", "", fOutRootFile);
       oc  = new CnipolPmtHists(dir);
       fHists->d["pmt"] = oc;
-      fHistCuts[kCUT_PASSONE_PMT].insert(oc);
+      fHistCuts[kCUT_PMT].insert(oc);
    }
 
    if (gAsymAnaInfo->HasPulserBit()) {

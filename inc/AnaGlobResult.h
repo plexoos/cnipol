@@ -56,6 +56,7 @@ public:
 	void                       UpdMinMaxFill(UInt_t fillId);
 	void                       UpdMinMaxTime(time_t time);
    void                       AdjustMinMaxFill();
+   Int_t                       GetTargetStatus(Double_t runId, ETargetOrient tgetOrient, UShort_t targetId);
    UInt_t                     GetMinFill() const { return fMinFill; }
    UInt_t                     GetMaxFill() const { return fMaxFill; }
    time_t                     GetMinTime() const { return fMinTime; }
@@ -63,7 +64,7 @@ public:
    BeamEnergySet              GetBeamEnergies() const { return fBeamEnergies; }
    void                       AddMeasResult(AnaMeasResult &result);
    void                       AddMeasResult(EventConfig &mm, DrawObjContainer *ocIn=0);
-   void                       AddHJMeasResult();
+   void                       AddHJMeasResult(Int_t runID);
    void                       Process(DrawObjContainer *ocOut=0);
    ValErrPair                 GetBeamPolar(ERingId ringId, UInt_t fillId, Bool_t norm=kTRUE);
    PolId2TgtOrient2ValErrMap  GetAvrgPCProfRUnWs() const { return fAvrgPCProfRUnWs; }

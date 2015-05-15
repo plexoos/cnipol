@@ -325,6 +325,7 @@ void RawDataReader::ReadDataPassOne(MseMeasInfoX &mseMeasInfo)
 
    gMeasInfo->fNEventsProcessed = 0;
    gMeasInfo->fNEventsTotal     = 0;
+   gMeasInfo->fNEventsSilicon   = 0;
 
    RecordHeaderStruct *mHeader;
    const char *mSeek = fMem;
@@ -406,6 +407,7 @@ void RawDataReader::ReadDataPassTwo(MseMeasInfoX &mseMeasInfo)
    mseMeasInfo.stop_time         = mysqlpp::DateTime(gMeasInfo->fStopTime);
    mseMeasInfo.nevents_total     = gMeasInfo->fNEventsTotal;
    mseMeasInfo.nevents_processed = gMeasInfo->fNEventsProcessed;
+   mseMeasInfo.nevents_silicon   = gMeasInfo->fNEventsSilicon;
 
    if (gAsymAnaInfo->HasAlphaBit())
       mseMeasInfo.beam_energy = 0;
@@ -589,6 +591,8 @@ static void ProcessRecordATPassOne(const char *mSeek, RecordHeaderStruct *mHeade
 
          if ( gAsymRoot->fChannelEvent->PassCutSiliconChannel() )
          {
+            gMeasInfo->fNEventsSilicon++;
+
             // Fill hists with raw data
             gAsymRoot->FillPassOne(kCUT_PASSONE);
 
@@ -700,6 +704,11 @@ static void ProcessRecordATPassTwo(const char *mSeek, RecordHeaderStruct *mHeade
          if ( gAsymRoot->fChannelEvent->PassCutSiliconChannel() )
          {
             gAsymRoot->Fill(kCUT_PASSTWO);
+         }
+
+         if ( gAsymRoot->fChannelEvent->PassCutPmtChannel() )
+         {
+            gAsymRoot->Fill(kCUT_PMT);
          }
 
          if (gMeasInfo->fNEventsProcessed%50000 == 0)

@@ -31,7 +31,12 @@ void CnipolPmtHists::BookHists()
 
    fDir->cd();
 
-   for (int iChId=N_SILICON_CHANNELS+1; iChId<=N_SILICON_CHANNELS+4; iChId++)
+   sprintf(hName, "hChVsDelim");
+   o[hName] = new TH2I(hName, hName, 1, 0, 1, N_PMT_CHANNELS, FIRST_PMT_CHANNEL-0.5, FIRST_PMT_CHANNEL-0.5+N_PMT_CHANNELS);
+   ((TH1*) o[hName])->SetOption("colz LOGZ");
+   ((TH1*) o[hName])->SetTitle("; Time, s; Channel Id;");
+
+   for (int iChId = FIRST_PMT_CHANNEL; iChId < FIRST_PMT_CHANNEL + N_PMT_CHANNELS; iChId++)
    {
       string sChId("  ");
       sprintf(&sChId[0], "%02d", iChId);
@@ -60,7 +65,19 @@ void CnipolPmtHists::BookHists()
 
 
 /** */
-void CnipolPmtHists::FillPassOne(ChannelEvent *ch)
+void CnipolPmtHists::PreFill()
+{
+   TH2I *h = (TH2I*) o["hChVsDelim"];
+   TAxis *axis = h->GetYaxis();
+   h->SetBins(
+      gNDelimeters*10, 0, gNDelimeters,
+      axis->GetNbins(), axis->GetXmin(), axis->GetXmax()
+      );
+}
+
+
+/** */
+void CnipolPmtHists::Fill(ChannelEvent *ch)
 {
    UChar_t chId = ch->GetChannelId();
 
@@ -71,13 +88,22 @@ void CnipolPmtHists::FillPassOne(ChannelEvent *ch)
    ((TH1*) o["hTdc_ch"       + sChId]) -> Fill(ch->GetTdc());
    ((TH1*) o["hTvsA_ch"      + sChId]) -> Fill(ch->GetAmpltd(), ch->GetTdc());
    ((TH1*) o["hTvsI_ch"      + sChId]) -> Fill(ch->GetIntgrl(), ch->GetTdc());
+
+   Double_t time = ch->GetRevolutionId() / (double)RHIC_REVOLUTION_FREQ;
+   ((TH2*) o["hChVsDelim"])->Fill(time, chId);
 }
 
 
 /** */
-void CnipolPmtHists::PostFillPassOne(DrawObjContainer *oc)
+void CnipolPmtHists::PostFill()
 {
-   Info("PostFillPassOne", "Starting...");
+   Info("PostFill", "Starting...");
+
+   fDir->cd();
+   TH1D *px = ((TH2I*) o["hChVsDelim"])->ProjectionX();
+   o[px->GetName()] = px;
+   TH1D *py = ((TH2I*) o["hChVsDelim"])->ProjectionY();
+   o[py->GetName()] = py;
 
    for (int iChId=N_SILICON_CHANNELS+1; iChId<=N_SILICON_CHANNELS+4; iChId++)
    {

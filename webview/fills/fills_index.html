@@ -214,8 +214,8 @@ unset($e);
 $header = "";
 
 if ($gMode == 11)
-   $header = "<pre>".sprintf("%10s %10s %12s %16s %16s %16s %16s %16s %16s\n", "", "", "", "Blue", "Blue", "Blue", "Yellow", "Yellow", "Yellow")
-                    .sprintf("%10s %10s %12s %16s %16s %16s %16s %16s %16s\n", "Fill", "Beam E", "Start T", "P Avrg.", "P_0", "dP/dT", "P Avrg.", "P_0", "dP/dT");
+   $header = "<pre>".sprintf("%10s %10s %12s %12s %16s %16s %16s %16s %16s %16s\n", "", "", "","", "Blue", "Blue", "Blue", "Yellow", "Yellow", "Yellow")
+                    .sprintf("%10s %10s %12s %12s %16s %16s %16s %16s %16s %16s\n", "Fill", "Beam E", "Start T", "Stop T", "P Avrg.", "P_0", "dP/dT", "P Avrg.", "P_0", "dP/dT");
 else if ($gMode == 2)
 {
    $header = "
@@ -226,6 +226,7 @@ else if ($gMode == 2)
    <th rowspan=2>Type
    <th rowspan=2>Beam Energy, GeV
    <th rowspan=2>Start Time
+   <th rowspan=2>Fill Length
 
    <th class='bluPol' colspan=3>Polarization,&nbsp;%<br>In collisions
    <th class='yelPol' colspan=3>Polarization,&nbsp;%<br>In collisions
@@ -289,7 +290,8 @@ else if ($gMode == 2)
 
    <th rowspan=2>Type
    <th rowspan=2>Beam Energy, GeV
-   <th rowspan=2>Start Time
+   <th rowspan=2>Physics On
+   <th rowspan=2>Fill Length
 
    <th class='bluPol' colspan=3>Polarization,&nbsp;%<br>In collisions
    <th class='yelPol' colspan=3>Polarization,&nbsp;%<br>In collisions
@@ -343,7 +345,9 @@ foreach ($globResult->fFillResults as $fill):
 
    $strFillId                = $fill->fFillId >= 0 ? $fill->fFillId : "&nbsp;";
    $strStartTime             = $fill->fStartTime > 0 ? date("M d, Y H:i:s D", $fill->fStartTime) : "&nbsp;";
+   $strStopTime              = $fill->fStopTime  > 0 ? date("M d, Y H:i:s D", $fill->fStopTime) : "&nbsp;";
    $strFillType              = $fill->fType >= 0 ? $FILLTYPE[$fill->fType] : "&nbsp;";
+   $strTimeDiff              = $fill->fTimeDiff;
    $strBeamEnergy            = $fill->fBeamEnergy >= 0 ? sprintf("%6.0f", $fill->fBeamEnergy) : "&nbsp;";
 
    $hjPolarBlu               = $fill->fHJPolars[1];
@@ -424,6 +428,7 @@ if (file_exists("$gAnaResDir/images/fills/$strFillId")) {
    <td class='align_cm'><?=$strFillType?>
    <td class='align_cm'><?=$strBeamEnergy?>
    <td class='align_cm nowrap'><?=$strStartTime?>
+   <td class='align_cm nowrap'><?=$strTimeDiff?>
 
    <td class='align_cm nowrap bluPol'><b><?=polarPairToString($fill->fCollBeamPolars[1])?></b>
    <td class='align_cm nowrap bluPol'><b><?=polarPairToString($fill->fCollBeamPolarP0s[1])?></b>&nbsp;<?=polarPairToString($fill->fCollBeamPolarP0s_patched[1])?>
@@ -479,6 +484,7 @@ if (file_exists("$gAnaResDir/images/fills/$strFillId")) {
    <td class='align_cm'><?=$strFillType?>
    <td class='align_cm'><?=$strBeamEnergy?>
    <td class='align_cm'><?=$strStartTime?>
+   <td class='align_cm'><?=$strTimeDiff?>
 
    <td class='align_cm nowrap bluPol'><b><?=polarPairToString($fill->fCollBeamPolars[1])?></b>
    <td class='align_cm nowrap bluPol'><b><?=polarPairToString($fill->fCollBeamPolarP0s_patched[1])?></b>
@@ -538,6 +544,7 @@ if ($gMode == 2):
    <th>&nbsp;
    <th>&nbsp;
    <th>&nbsp;
+   <th>&nbsp;
 
    <th class='bluPol align_ct'><?=polarPairToString($avrgCollBeamPolarBlu)?>
    <th class='bluPol align_ct'><?=polarPairToString($avrgCollBeamPolarP0Blu)?>
@@ -593,6 +600,7 @@ if ($gMode == 2):
    <th>&nbsp;
    <th>&nbsp;
    <th>&nbsp;
+   <th>&nbsp;
 
    <th class='bluPol align_cm'><?=sprintf("%5.2f", $polarB_Coll_RelErr)?>
    <th class='bluPol align_ct'>&nbsp;
@@ -643,6 +651,7 @@ else:
    <th>&nbsp;
    <th>&nbsp;
    <th>&nbsp;
+   <th>&nbsp;
 
    <th class='bluPol align_ct'><?=polarPairToString($avrgCollBeamPolarBlu)?>
    <th class='bluPol align_ct'><?=polarPairToString($avrgCollBeamPolarP0Blu)?>
@@ -655,6 +664,7 @@ else:
 <tr>
    <th>
    <img src=https://wiki.bnl.gov/rhicspin/upload/math/d/6/c/d6cfca0bac999e6cc65487d1a8f8dad7.png>
+   <th>&nbsp;
    <th>&nbsp;
    <th>&nbsp;
    <th>&nbsp;
@@ -679,6 +689,13 @@ endif;
 For details on calculation of normalization factors go to <a
 href="https://wiki.bnl.gov/rhicspin/PCarbon_normalization">https://wiki.bnl.gov/rhicspin/PCarbon_normalization</a>.
 Normalization k<sub>jet/crb</sub> applied to p-Carbon polarization for selected run period is:
+
+<p>&nbsp;
+
+<h3>Table Definitions</h3>
+
+Details on each column in the table above can be found by clicking <a href="table_def.html">Table Definitions</a>
+
 
 <?php
 print(GlobResult::BuildHtmlNormJetCarbon($_GET['rp']));
