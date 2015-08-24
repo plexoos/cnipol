@@ -36,6 +36,9 @@ void AlphaCalibrator::Calibrate(DrawObjContainer *c)
    bool     fit_gadolinium = gMeasInfo->GetAlphaSourceCount() == 2;
 
    for (UShort_t i = 1; i <= NSTRIP; i++) {
+      if (gMeasInfo->IsDisabledChannel(i))
+         continue;
+
       sprintf(&sCh[0], "%02d", i);
 
       ChannelCalib *chCalib;
@@ -104,7 +107,7 @@ void AlphaCalibrator::Calibrate(DrawObjContainer *c)
    ((TH1F*) c->d["alpha"]->o["hDeadLayerSize"])->SetName("hDeadLayerSize");
    ((TH1F*) c->d["alpha"]->o["hDeadLayerSize"])->SetTitle("hDeadLayerSize");
    ((TH1F*) c->d["alpha"]->o["hDeadLayerSize"])->GetXaxis()->SetTitle("Channel");
-   ((TH1F*) c->d["alpha"]->o["hDeadLayerSize"])->GetYaxis()->SetTitle("Dead layer size, \\mu g/cm^2");
+   ((TH1F*) c->d["alpha"]->o["hDeadLayerSize"])->GetYaxis()->SetTitle("\\text{Dead layer size, }\\mu g/cm^2");
    ((TH1F*) c->d["alpha"]->o["hDeadLayerSize"])->SetOption("E1 GRIDX GRIDY");
 
    // Dead layer size value are invalid in the channels where Gd peak wasn't found
@@ -235,7 +238,7 @@ TFitResultPtr AlphaCalibrator::Calibrate(TH1F *h, bool fit_gadolinium, bool *gad
    // First fit is to find americium peak
    // Will start from guessing initial params
    float norm_amer;
-   int   mbin_amer = utils::FindMaximumBinEx(h, 1, &norm_amer);
+   int   mbin_amer = utils::FindMaximumBinEx(h, 2, &norm_amer);
    float mean_amer = h->GetBinCenter(mbin_amer);
    float expectedSigma = 0.7;
 

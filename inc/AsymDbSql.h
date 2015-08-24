@@ -5,11 +5,7 @@
 
 #include "mysql++.h"
 
-#include "AsymDb.h"
-#include "DbEntry.h"
-
 #include "MseMeasInfo.h"
-#include "MseRunPeriod.h"
 #include "MseFillPolar.h"
 #include "MseFillPolarNew.h"
 #include "MseFillProfile.h"
@@ -19,7 +15,7 @@
 /**
  * select information about run periods from an ascii file.
  */
-class AsymDbSql : public AsymDb
+class AsymDbSql
 {
 
 public:
@@ -31,23 +27,19 @@ public:
    
    void                       OpenConnection();
    void                       CloseConnection();
-   DbEntry*                   Select(std::string runName="");
    MseMeasInfoX*              SelectRun(std::string runName="");
    MseFillPolarX*             SelectFillPolar(UInt_t fill);
    MseFillPolarNewX*          SelectFillPolar(UInt_t fill, EPolarimeterId polId, ERingId ringId);
    MseFillPolarNewXSet        SelectFillPolars(UInt_t fill);
    MseFillProfileX*           SelectFillProfile(UInt_t fill);
    MseFillProfileNewX*        SelectFillProfile(UInt_t fill, EPolarimeterId polId, ETargetOrient tgtOrient);
-   std::vector<MseMeasInfoX>  SelectPriorRuns(MseMeasInfoX& run);
-   MseRunPeriodX*             SelectRunPeriod(MseMeasInfoX& run);
-	void                       CompleteMeasInfo(MseMeasInfoX& run);
-	MseRunPeriodX*             CompleteMeasInfoByRunPeriod(MseMeasInfoX& run);
-   void                       Insert(DbEntry *dbrun);
-   void                       UpdateInsert(MseMeasInfoX* orun, MseMeasInfoX* nrun);
-   void                       UpdateInsert(MseFillPolarX*   ofill, MseFillPolarX*   nfill);
-   void                       UpdateInsert(MseFillPolarNewX* ofill, MseFillPolarNewX* nfill);
-   void                       UpdateInsert(MseFillProfileX* ofill, MseFillProfileX* nfill);
-   void                       UpdateInsert(MseFillProfileNewX* ofill, MseFillProfileNewX* nfill);
+   std::vector<MseMeasInfoX>  SelectPriorRuns(const MseMeasInfoX& run);
+   void                       CompleteMeasInfo(MseMeasInfoX& run);
+   void                       UpdateInsert(const MseMeasInfoX* orun, const MseMeasInfoX* nrun);
+   void                       UpdateInsert(const MseFillPolarX*   ofill, const MseFillPolarX*   nfill);
+   void                       UpdateInsert(const MseFillPolarNewX* ofill, const MseFillPolarNewX* nfill);
+   void                       UpdateInsert(const MseFillProfileX* ofill, const MseFillProfileX* nfill);
+   void                       UpdateInsert(const MseFillProfileNewX* ofill, const MseFillProfileNewX* nfill);
 
 private:
 

@@ -22,10 +22,10 @@
 #include "AsymOnline.h"
 #include "BeamBunch.h"
 #include "RunConfig.h"
-#include "DbEntry.h"
 
 class MseMeasInfoX;
 class MseRunPeriodX;
+class RunPeriod;
 
 class MeasInfo;
 
@@ -150,10 +150,9 @@ public:
    Short_t         GetPolarimeterId(short beamId, short streamId);
    UInt_t          GetFillId();
    bool            IsRunYear(int year);
-   void            Update(DbEntry &rundb);
-   void            Update(MseMeasInfoX& run);
-   void            Update(MseRunPeriodX& runPeriod);
-   void            Update(AsymAnaInfo& anaInfo);
+   void            Update(const MseMeasInfoX& run);
+   void            Update(const RunPeriod& runPeriod);
+   void            Update(const AsymAnaInfo& anaInfo);
    void            UpdateRevolutions(UInt_t revId);
    void            ConfigureActiveStrip(int mask);
    Float_t         GetBeamEnergyReal() const;

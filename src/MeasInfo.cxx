@@ -9,7 +9,7 @@
 
 #include "AsymAnaInfo.h"
 #include "MseMeasInfo.h"
-#include "MseRunPeriod.h"
+#include "RunPeriod.h"
 
 #include "revision-export.h"
 
@@ -232,8 +232,6 @@ void MeasInfo::PrintConfig()
    fprintf(stdout, "=== RHIC Polarimeter Configuration (BGN) ===\n");
 
    // Configulation File
-   fprintf(stdout,"         RUN STATUS = %s\n", gRunDb.run_status_s.c_str());
-   fprintf(stdout,"         MEAS. TYPE = %s\n", gRunDb.measurement_type_s.c_str());
    fprintf(stdout,"             CONFIG = %s\n", reConfFile);
    fprintf(stdout,"              CALIB = %s\n", CalibFile);
 
@@ -246,9 +244,6 @@ void MeasInfo::PrintConfig()
    // target count/mm
    fprintf(stdout,"    TARGET_COUNT_MM = %.5f\n", gAsymAnaInfo->target_count_mm);
 
-   // print comment
-   if (strlen(gRunDb.comment_s.c_str())>3)
-     printf("            COMMENT = %s\n",    gRunDb.comment_s.c_str());
 }
 
 
@@ -361,41 +356,8 @@ void MeasInfo::GetBeamIdStreamId(Short_t polId, UShort_t &beamId, UShort_t &stre
 }
 
 
-/** Deprecated. */
-void MeasInfo::Update(DbEntry &rundb)
-{
-   stringstream sstr;
-   UShort_t     chId;
-
-   sstr << rundb.fFields["DISABLED_CHANNELS"];
-
-   while (sstr >> chId) {
-      DisableChannel(chId);
-   }
-
-   // For compatibility reasons set the Run variable
-   // Taken from AsymRunDb
-   if (RUNID < 6500) { // Run undefined
-      fRunId = 0;
-
-   } else if (RUNID >= 6500 && RUNID < 7400) { // Run05
-      fRunId = 5;
-      for (int i=0; i<N_SILICON_CHANNELS; i++) gPhi[i] = phiRun5[i];
-
-   } else if (RUNID >= 7400 && RUNID < 10018) { // Run06
-      fRunId = 6;
-      for (int i=0; i<N_SILICON_CHANNELS; i++) gPhi[i] = phiRun6[i];
-
-   } else if (RUNID >= 10018 && RUNID < 14000) { // Run09
-      fRunId = 9;
-
-   } else
-      fRunId = 11;
-}
-
-
 /** */
-void MeasInfo::Update(MseMeasInfoX& run)
+void MeasInfo::Update(const MseMeasInfoX& run)
 {
    stringstream sstr;
    UShort_t     chId;
@@ -443,7 +405,7 @@ void MeasInfo::Update(MseMeasInfoX& run)
 
 
 /** */
-void MeasInfo::Update(MseRunPeriodX& runPeriod)
+void MeasInfo::Update(const RunPeriod& runPeriod)
 {
    fAlphaSourceCount = UChar_t(runPeriod.alpha_source_count);
    fProtoCutSlope    = runPeriod.cut_proto_slope;
@@ -464,7 +426,7 @@ void MeasInfo::Update(MseRunPeriodX& runPeriod)
  * Call this method to override some parameters by those provided by the user
  * in the command line.
  */
-void MeasInfo::Update(AsymAnaInfo& anaInfo)
+void MeasInfo::Update(const AsymAnaInfo& anaInfo)
 {
    if (anaInfo.fAlphaSourceCount >= 0)
       fAlphaSourceCount = anaInfo.fAlphaSourceCount;

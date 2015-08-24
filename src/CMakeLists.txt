@@ -30,8 +30,6 @@ ADD_LIBRARY(
 	AsymAnaInfo.cxx
 	AsymCalculator.cxx
 	AsymCommon.cxx
-	AsymDb.cxx
-	AsymDbFile.cxx
 	AsymDbSql.cxx
 	AsymErrorDetector.cxx
 	AsymOnline.cxx
@@ -61,7 +59,6 @@ ADD_LIBRARY(
 	CnipolScalerHists.cxx
 	CnipolSpinStudyHists.cxx
 	CnipolTargetHists.cxx
-	DbEntry.cxx
 	DeadLayerCalibrator.cxx
 	DeadLayerCalibratorEDepend.cxx
 	DrawObjContainer.cxx
@@ -80,9 +77,9 @@ ADD_LIBRARY(
 	MseFillProfile.cxx
 	MseFillProfileNew.cxx
 	MseMeasInfo.cxx
-	MseRunPeriod.cxx
 	RawDataReader.cxx
 	RunConfig.cxx
+	RunPeriod.c
 	RunQA.cxx
 	SshLogReader.cxx
 	Target.cxx

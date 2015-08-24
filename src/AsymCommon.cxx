@@ -134,7 +134,6 @@ MeasInfo                 *gMeasInfo;
 AnaMeasResult            *gAnaMeasResult;
 AsymRoot                 *gAsymRoot;
 UShort_t                 *gCh2WfdMap = 0;
-DbEntry                   gRunDb;
 RunConfig                 gRunConfig;
 atdata_struct             atdata;
 StructAverage             average;

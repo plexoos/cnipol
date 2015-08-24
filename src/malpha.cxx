@@ -205,7 +205,7 @@ void PlotMean(DrawObjContainer *oc, const char *name, ResultMean &result, Result
    host_name += name;
    if (max_startTime)
    {
-      host = new TH1F(host_name, "", 100 * result.first.size(), -86400, max_startTime - min_startTime + 86400);
+      host = new TH1F(host_name, "", 1, -86400, max_startTime - min_startTime + 86400);
    }
    else
    {
@@ -223,7 +223,7 @@ void PlotMean(DrawObjContainer *oc, const char *name, ResultMean &result, Result
 
       if (max_startTime)
       {
-         det_host = new TH1F(det_host_name, "", 100 * result.first.size(), -86400, max_startTime - min_startTime + 86400);
+         det_host = new TH1F(det_host_name, "", 1, -86400, max_startTime - min_startTime + 86400);
       }
       else
       {
@@ -283,29 +283,6 @@ void PlotMean(DrawObjContainer *oc, const char *name, ResultMean &result, Result
       }
       TString sDet("Det");
       sDet += (det + 1);
-      if (max_startTime)
-      {
-         TF1   fit_daily("fit_daily", "pol0");
-         TF1   det_fit_daily("det_fit_daily", "pol0");
-         fit_daily.SetLineColor(line_color);
-         fit_daily.SetLineWidth(0.5);
-         det_fit_daily.SetLineColor(kBlack);
-         det_fit_daily.SetLineWidth(0.5);
-
-         if (gMeasInfo->IsRunYear(2013))
-         {
-            Warning("malpha", "detected run13 : will fit only during beamtime");
-            const double fit_min = 1362096000 - min_startTime; // 03/01/2013 00:00:00
-            const double fit_max = 1372636800 - min_startTime; // 07/01/2013 00:00:00
-            g->Fit(&fit_daily, "Q", "", fit_min, fit_max); // Q: quiet
-            det_g->Fit(&det_fit_daily, "Q", "", fit_min, fit_max);   // Q: quiet
-         }
-         else
-         {
-            g->Fit(&fit_daily, "Q"); // Q: quiet
-            det_g->Fit(&det_fit_daily, "Q");   // Q: quiet
-         }
-      }
       g->SetName(sDet);
       det_g->SetName(sDet);
 
@@ -351,6 +328,11 @@ void PlotMean(DrawObjContainer *oc, const char *name, ResultMean &result, Result
 }
 
 
+// Exclude zero bias current values from fit
+#define DoBCGainFit(g) \
+   ((g)->Fit("pol1", "QS", "", -50., -0.1)); // Q: quiet, S: return fitres
+
+
 void PlotCorrelation(DrawObjContainer *oc, const char *name, ResultMean &r1, ResultMean &r1_err, ResultMean &r2, ResultMean &r2_err)
 {
    if ((r1.first.empty() && r1.second.empty()) || (r2.first.empty() && r2.second.empty()))
@@ -360,9 +342,7 @@ void PlotCorrelation(DrawObjContainer *oc, const char *name, ResultMean &r1, Res
 
    ObjMap	&o = oc->o;
    TString	hname(name);
-   TH2F	*h = new TH2F(hname, hname,
-                      r1.max_value - r1.min_value, r1.min_value, r1.max_value,
-                      r2.max_value - r2.min_value, r2.min_value, r2.max_value);
+   TH2F	*h = new TH2F(hname, hname, 1, r1.min_value, r1.max_value, 1, r2.min_value, r2.max_value);
    h->SetOption("DUMMY");
 
    for (int det = 0; det < N_DETECTORS; det++)
@@ -391,6 +371,17 @@ void PlotCorrelation(DrawObjContainer *oc, const char *name, ResultMean &r1, Res
       }
 
       h->GetListOfFunctions()->Add(g, "p");
+
+      TString hdetname(name);
+      hdetname += (det + 1);
+      TH2F *hdet = new TH2F(hdetname, hdetname, 1, r1.min_value, r1.max_value, 1, r2.min_value, r2.max_value);
+      hdet->SetOption("DUMMY");
+      hdet->SetXTitle(r1.YTitle.c_str());
+      hdet->SetYTitle(r2.YTitle.c_str());
+      hdet->GetListOfFunctions()->Add(g, "p");
+      if (strcmp(name, "hBiasCurrent_AmGain") == 0)
+         DoBCGainFit(g);
+      o[hdetname.Data()] = hdet;
    }
    h->SetXTitle(r1.YTitle.c_str());
    h->SetYTitle(r2.YTitle.c_str());
@@ -410,7 +401,7 @@ vector<double> DoAmGainCorrection(ResultMean &rhAmGain, ResultMean &rhAmGainErr,
 
    for(int det = 0; det < N_DETECTORS; det++)
    {
-      int count = 0;
+      TGraph g(0);
       for (map< Time, vector<double> >::iterator it = rhAmGain.second.begin(); it != rhAmGain.second.end(); it++)
       {
          Time   time = it->first;
@@ -419,27 +410,19 @@ vector<double> DoAmGainCorrection(ResultMean &rhAmGain, ResultMean &rhAmGainErr,
 
          if (rBiasCurrent.second.count(time) && (!isnan(bias_current)) && !isnan(det_gain.at(det)))
          {
-            count++;
+            int n = g.GetN();
+            g.Set(n + 1);
+            g.SetPoint(n, bias_current, det_gain.at(det));
          }
       }
-      TGraph g(count);
-      int i = 0;
-      for (map< Time, vector<double> >::iterator it = rhAmGain.second.begin(); it != rhAmGain.second.end(); it++)
+      TFitResultPtr fitres = DoBCGainFit(&g);
+      double val = NAN;
+      if (fitres.Get())
       {
-         Time   time = it->first;
-         vector<double>    &det_gain = it->second;
-         double    bias_current = rBiasCurrent.second[time].at(det);
-
-         if (rBiasCurrent.second.count(time) && (!isnan(bias_current)) && !isnan(det_gain.at(det)))
-         {
-            g.SetPoint(i, bias_current, det_gain.at(det));
-            i++;
-         }
+         assert(!isnan(fitres->Value(1)));
+         val = fitres->Value(1);
       }
-      assert(i == count);
-      TFitResultPtr fitres = g.Fit("pol1", "QS"); // Q: quiet, S: return fitres
-      assert(!isnan(fitres->Value(1)));
-      slope.push_back(fitres->Value(1));
+      slope.push_back(val);
    }
 
    rhAmGainCorrected = rhAmGain;
@@ -496,7 +479,7 @@ void FillBiasCurrent(opencdev::LogReader *log_reader, EPolarimeterId polId, doub
    rBiasCurrentErr[polId].second[startTime].resize(N_DETECTORS, (double)0.0);
 
    FillDetectorAverage(rBiasCurrent[polId], rBiasCurrentErr[polId], startTime);
-   rBiasCurrent[polId].YTitle = "BiasCurrent, \\mu A";
+   rBiasCurrent[polId].YTitle = "\\text{Bias current, }\\mu A";
 }
 
 void FillBeamCurrent(opencdev::LogReader *log_reader, int fill_id, EPolarimeterId polId, double startTime, map< Short_t, ResultMean > &rBeamCurrent, map< Short_t, ResultMean > &rBeamCurrentErr)
@@ -649,7 +632,15 @@ int main(int argc, char *argv[])
       string   runName      = gMM->fMeasInfo->GetRunName();
       Short_t  polId        = gMM->fMeasInfo->fPolId;
       Double_t startTime    = gMM->fMeasInfo->fStartTime;
+      Double_t stopTime     = gMM->fMeasInfo->fStopTime;
       Double_t ssh_endTime  = gMM->fMeasInfo->fStopTime;
+      Double_t eventRate    = gMM->fMeasInfo->fNEventsSilicon / (double)(stopTime - startTime); // event/s
+
+      if (eventRate > 100.)
+      {
+         Error("malpha", "Silicon event rate is too high (%f). Skipping...", eventRate);
+         continue;
+      }
 
       if ((gMM->fMeasInfo->RUNID == 70213)
           || (int(gMM->fMeasInfo->RUNID) == 17400) // this one takes too long to process
@@ -737,6 +728,15 @@ int main(int argc, char *argv[])
    for (iPolId = gRunConfig.fPolarimeters.begin(); iPolId != gRunConfig.fPolarimeters.end(); ++iPolId)
    {
       Short_t polId = *iPolId;
+      slope[*iPolId] = DoAmGainCorrection(rhAmGain[polId], rhAmGainErr[polId], rBiasCurrent[polId], rhAmGainCorrected[polId], rhAmGainCorrectedErr[polId]);
+   }
+
+   // Redo the histogram limits for corrected gains
+   FillDeviceMaxMin(rhAmGainCorrected);
+
+   for (iPolId = gRunConfig.fPolarimeters.begin(); iPolId != gRunConfig.fPolarimeters.end(); ++iPolId)
+   {
+      Short_t polId = *iPolId;
       string  polIdName = RunConfig::AsString(*iPolId);
 
       oc->d[polIdName] = new DrawObjContainer(f1->mkdir(polIdName.c_str()));
@@ -745,7 +745,9 @@ int main(int argc, char *argv[])
       sub_oc->fDir->cd();
       gROOT->GetListOfCanvases()->Clear(); // hack to prevent canvas deletion
 
-      slope[*iPolId] = DoAmGainCorrection(rhAmGain[polId], rhAmGainErr[polId], rBiasCurrent[polId], rhAmGainCorrected[polId], rhAmGainCorrectedErr[polId]);
+      // Share histogram limits between normal and corrected gains
+      rhAmGain[polId].min_value = rhAmGainCorrected[polId].min_value = min(rhAmGain[polId].min_value, rhAmGainCorrected[polId].min_value);
+      rhAmGain[polId].max_value = rhAmGainCorrected[polId].max_value = max(rhAmGain[polId].max_value, rhAmGainCorrected[polId].max_value);
 
       PlotMean(sub_oc, "hAmGain_by_day", rhAmGain[polId], rhAmGainErr[polId], runNameD[polId], min_startTime, max_startTime);
       PlotMean(sub_oc, "hAmGainCorrected_by_day", rhAmGainCorrected[polId], rhAmGainCorrectedErr[polId], runNameD[polId], min_startTime, max_startTime);
@@ -770,7 +772,9 @@ int main(int argc, char *argv[])
    if (mAlphaAnaInfo.HasGraphBit())
    {
       TCanvas r("r", "", 1000, 800);
-      oc->SaveAllAs(DrawObjContainer::FORMAT_PNG, r, "^.*$", mAlphaAnaInfo.GetImageDir(), false);
+      string ext = "." + mAlphaAnaInfo.fImgFmtName;
+      DrawObjContainer::ImageFormat fmt = ext.c_str();
+      oc->SaveAllAs(fmt, r, "^.*$", mAlphaAnaInfo.GetImageDir(), false);
    }
    oc->Write();
    f1->Close();
