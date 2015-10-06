@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <getopt.h>
 
 #include "AsymAnaInfo.h"
@@ -65,6 +66,7 @@ Bool_t AsymAnaInfo::HasKinematBit()     const { return (fAsymModes & AsymAnaInfo
 Bool_t AsymAnaInfo::HasPmtBit()         const { return (fAsymModes & AsymAnaInfo::MODE_PMT)          == AsymAnaInfo::MODE_PMT; }
 Bool_t AsymAnaInfo::HasPulserBit()      const { return (fAsymModes & AsymAnaInfo::MODE_PULSER)       == AsymAnaInfo::MODE_PULSER; }
 Bool_t AsymAnaInfo::HasStudiesBit()     const { return (fAsymModes & AsymAnaInfo::MODE_STUDIES)      == AsymAnaInfo::MODE_STUDIES; }
+Bool_t AsymAnaInfo::HasNoGainCorrectionBit() const { return (fAsymModes & AsymAnaInfo::MODE_NO_GAIN_CORRECTION) == AsymAnaInfo::MODE_NO_GAIN_CORRECTION; }
 
 
 /** */
@@ -101,6 +103,7 @@ void AsymAnaInfo::ProcessOptions(int argc, char **argv)
       {"log",                 optional_argument,   0,   'l'},
       {"sfx",                 required_argument,   0,   AnaInfo::OPTION_SUFFIX},
       {"graph",               no_argument,         0,   AnaInfo::MODE_GRAPH},
+      {"image-format",        required_argument,   0,   AnaInfo::OPTION_IMG_FMT},
 
       {"update-db",           no_argument,         0,   AnaInfo::FLAG_UPDATE_DB},
       {"no-update-db",        no_argument,         0,   AnaInfo::FLAG_NO_UPDATE_DB},
@@ -130,6 +133,7 @@ void AsymAnaInfo::ProcessOptions(int argc, char **argv)
       {"mode-asym",           no_argument,         0,   AsymAnaInfo::MODE_ASYM},
       {"mode-kinema",         no_argument,         0,   AsymAnaInfo::MODE_KINEMA},
       {"mode-pmt",            no_argument,         0,   AsymAnaInfo::MODE_PMT},
+      {"no-gain-correction",  no_argument,         0,   AsymAnaInfo::MODE_NO_GAIN_CORRECTION},
       {"set-calib-alpha",     required_argument,   0,   AsymAnaInfo::OPTION_SET_CALIB_ALPHA},
       {"disable-det",         required_argument,   0,   AsymAnaInfo::OPTION_DET_DISABLE},
       {"alpha-sources",       required_argument,   0,   AsymAnaInfo::OPTION_ALPHA_SOURCES},
@@ -157,6 +161,11 @@ void AsymAnaInfo::ProcessOptions(int argc, char **argv)
       case 'g':
       case AnaInfo::MODE_GRAPH:
          fModes |= AnaInfo::MODE_GRAPH;
+         break;
+
+      case AnaInfo::OPTION_IMG_FMT:
+         fImgFmtName = optarg;
+         std::transform(fImgFmtName.begin(), fImgFmtName.end(), fImgFmtName.begin(), ::tolower);
          break;
 
       case AnaInfo::OPTION_SUFFIX:
@@ -298,6 +307,10 @@ void AsymAnaInfo::ProcessOptions(int argc, char **argv)
          fAsymModes |= AsymAnaInfo::MODE_STUDIES;
          break;
 
+      case AsymAnaInfo::MODE_NO_GAIN_CORRECTION:
+         fAsymModes |= AsymAnaInfo::MODE_NO_GAIN_CORRECTION;
+         break;
+
       default:
          Error("ProcessOptions", "Unknown option provided");
          PrintUsage();
@@ -408,6 +421,7 @@ void AsymAnaInfo::PrintUsage()
    cout << "     --mode-run                       : Fill and save bunch, lumi and other run related histograms" << endl;
    cout << "     --mode-target, --target          : Fill and save target histograms" << endl;
    cout << "     --mode-full                      : Fill and save all histograms" << endl;
+   cout << "     --no-gain-correction             : Disable the bias current correction" << endl;
    cout << "     --set-calib-alpha                : Provide a root file with alpha calibrations" << endl;
    cout << "     --use-db                         : Run info will be retrieved from and saved into database" << endl;
    cout << "     --update-db                      : Update run info in database" << endl;

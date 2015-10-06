@@ -4,10 +4,14 @@
 #include <sstream>
 #include <algorithm>
 
+#include <opencdev.h>
+
 #include "AsymGlobals.h"
 #include "AsymCommon.h"
 
 #include "AsymAnaInfo.h"
+#include "MAsymAnaInfo.h"
+#include "BiasCurrentUtil.h"
 #include "MseMeasInfo.h"
 #include "RunPeriod.h"
 
@@ -335,7 +339,7 @@ UInt_t MeasInfo::GetFillId()
 }
 
 
-bool MeasInfo::IsRunYear(int year)
+bool MeasInfo::IsRunYear(int year) const
 {
    time_t t = fStartTime;
    struct tm *time = gmtime(&t);
@@ -419,6 +423,8 @@ void MeasInfo::Update(const RunPeriod& runPeriod)
    fPulserCutAdcMax  = runPeriod.cut_pulser_adc_max;
    fPulserCutTdcMin  = runPeriod.cut_pulser_tdc_min;
    fPulserCutTdcMax  = runPeriod.cut_pulser_tdc_max;
+   for(int i = 0; i < N_DETECTORS; i++)
+      fGainSlope[i] = runPeriod.gain_slope[i];
 }
 
 
@@ -725,6 +731,40 @@ ETargetOrient MeasInfo::GetTargetOrient() const
    }
 }
 
+
+/** */
+vector<double> MeasInfo::GetBiasCurrents() const
+{
+   double startTime = fStartTime;
+   double endTime;
+
+   if (IsRunYear(2013)) {
+      // bigger (>500sec) window is needed because bias current measurements
+      // had a big sampling period during run13
+      endTime = max(double(fStopTime), startTime + 500);
+   } else {
+      endTime = fStopTime;
+      if (endTime < startTime) {
+         // 60 is a value that is about average for sweep measurements
+         Warning("GetBiasCurrents", "Invalid end time. Setting it to t+60");
+         endTime = startTime + 60;
+      }
+   }
+
+   AnaInfo *anaInfo = gAsymAnaInfo ? (AnaInfo*)gAsymAnaInfo : (AnaInfo*)gMAsymAnaInfo;
+
+   static opencdev::LocalLogReader log_reader(anaInfo->GetSlowControlLogDir());
+
+   string logger_name = BiasCurrentUtil::GetBiasCurrentLoggerName((EPolarimeterId)fPolId);
+   opencdev::mean_result_t bias_mean_value;
+
+   log_reader.query_timerange_mean(logger_name, startTime, endTime, &bias_mean_value);
+
+   vector<double> bc = BiasCurrentUtil::FillBiasCurrentMeanValue(bias_mean_value, (EPolarimeterId)fPolId);
+   assert(bc.size() == N_DETECTORS);
+
+   return bc;
+}
 
 /** */
 UShort_t MeasInfo::GetTargetId() const

@@ -602,10 +602,9 @@ void AsymRoot::UpdateCalibrator()
 
       fEventConfig->fCalibrator->CopyAlphaCoefs(*eventConfig->fCalibrator);
 
-      if (gMeasInfo->IsRunYear(2013)) {
+      if (!fEventConfig->GetAnaInfo()->HasNoGainCorrectionBit()) {
          fEventConfig->fCalibrator->ApplyBiasCurrentCorrection(gMeasInfo, true);
       } else {
-         // For all other years we just use plain alpha gains
          fEventConfig->fCalibrator->UsePlainAlphaGain();
       }
 
@@ -634,8 +633,7 @@ void AsymRoot::Calibrate()
 {
    fEventConfig->fCalibrator->Calibrate(fHists);
 
-   AsymAnaInfo *anaInfo = fEventConfig->GetAnaInfo();
-   if (gMeasInfo->IsRunYear(2013) && anaInfo->HasAlphaBit()) {
+   if (fEventConfig->GetAnaInfo()->HasAlphaBit() && !fEventConfig->GetAnaInfo()->HasNoGainCorrectionBit()) {
       fEventConfig->fCalibrator->ApplyBiasCurrentCorrection(gMeasInfo, false);
    }
 }
@@ -843,11 +841,13 @@ void AsymRoot::SaveAs(string pattern, string dir)
 
    fHists->SetSignature(fEventConfig->GetSignature());
 
-   fHists->SaveAllAs(DrawObjContainer::FORMAT_PNG, canvas, pattern, dir.c_str());
+   string ext = "." + gAsymAnaInfo->fImgFmtName;
+   DrawObjContainer::ImageFormat fmt = ext.c_str();
+   fHists->SaveAllAs(fmt, canvas, pattern, dir.c_str());
 
    if (gAsymAnaInfo->fFlagCreateThumbs) {
       TCanvas canvas("canvas", "canvas", 200, 100);
-      fHists->SaveAllAs(DrawObjContainer::FORMAT_PNG, canvas, pattern, dir.c_str(), kTRUE);
+      fHists->SaveAllAs(fmt, canvas, pattern, dir.c_str(), kTRUE);
    }
 }
 

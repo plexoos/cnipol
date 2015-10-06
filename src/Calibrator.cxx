@@ -1,12 +1,9 @@
-#include <opencdev.h>
-
 #include "Calibrator.h"
 
 #include "TMath.h"
 
 #include "AsymCommon.h"
 #include "AsymGlobals.h"
-#include "BiasCurrentUtil.h"
 #include "MeasInfo.h"
 
 
@@ -108,53 +105,20 @@ void Calibrator::UsePlainAlphaGain()
 
 void Calibrator::ApplyBiasCurrentCorrection(MeasInfo *measInfo, bool direct)
 {
-   // ============= malpha generated for run13_alpha_study_novoltagevariation begin
-   // ./malpha -mrun13_alpha_study_novoltagevariation -orun13.root -g
-   // version M;18f729f4a97fd332bdafe0b66cec41d6b8492435
-   map<int, vector<double> > slope; // {pol_id, det} -> slope
-   slope[0].resize(6);
-   slope[0][0] = 0.000984756;
-   slope[0][1] = 0.000883521;
-   slope[0][2] = 0.00112485;
-   slope[0][3] = 0.00108529;
-   slope[0][4] = 0.000959145;
-   slope[0][5] = 0.00104949;
-   slope[1].resize(6);
-   slope[1][0] = 0.00132049;
-   slope[1][1] = 0.000961331;
-   slope[1][2] = 0.00119244;
-   slope[1][3] = 0.00110028;
-   slope[1][4] = 0.00109446;
-   slope[1][5] = 0.0010553;
-   slope[2].resize(6);
-   slope[2][0] = 0.00108253;
-   slope[2][1] = 0.00106266;
-   slope[2][2] = 0.00111284;
-   slope[2][3] = 0.0012403;
-   slope[2][4] = 0.000961333;
-   slope[2][5] = 0.00101413;
-   slope[3].resize(6);
-   slope[3][0] = 0.00116314;
-   slope[3][1] = 0.00094103;
-   slope[3][2] = 0.00108774;
-   slope[3][3] = 0.00123473;
-   slope[3][4] = 0.00090758;
-   slope[3][5] = 0.00095644;
-   // ============= malpha generated end
+   int no_slope = 0;
+   for(int i = 0; i < N_DETECTORS; i++)
+      if (measInfo->fGainSlope[i] == 0)
+         no_slope++;
 
-   int polId = measInfo->fPolId;
-   double startTime = measInfo->fStartTime;
-   double endTime = max(double(measInfo->fStopTime), startTime + 500);
+   if (no_slope == N_DETECTORS) {
+      Warning("ApplyBiasCurrentCorrection",
+              "No gain vs bias current slopes in run configuration"
+              " - Falling back to plain alpha gain");
+      UsePlainAlphaGain();
+      return;
+   }
 
-   static opencdev::LocalLogReader log_reader(gAsymAnaInfo->GetSlowControlLogDir());
-
-   string logger_name = BiasCurrentUtil::GetBiasCurrentLoggerName((EPolarimeterId)polId);
-   opencdev::mean_result_t bias_mean_value;
-
-   log_reader.query_timerange_mean(logger_name, startTime, endTime, &bias_mean_value);
-
-   vector<double> bc = BiasCurrentUtil::FillBiasCurrentMeanValue(bias_mean_value, (EPolarimeterId)polId);
-   assert(bc.size() == N_DETECTORS);
+   vector<double> bc = measInfo->GetBiasCurrents();
 
    int not_avail = 0;
    for(int i = 0; i < N_DETECTORS; i++)
@@ -184,7 +148,7 @@ void Calibrator::ApplyBiasCurrentCorrection(MeasInfo *measInfo, bool direct)
       int det = ((chId - 1) / NSTRIP_PER_DETECTOR);
       ChannelCalib &calib = iCh->second;
       assert(det < N_DETECTORS);
-      double correction = slope.at(polId).at(det) * bc.at(det);
+      double correction = measInfo->fGainSlope[det] * bc.at(det);
 
       if (direct) {
          calib.fEffectiveGain = calib.fZeroBiasGain + correction;

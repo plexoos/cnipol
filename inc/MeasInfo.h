@@ -96,6 +96,7 @@ public:
    ChannelSet                  fSiliconChannels;        // a list of channels for silicon detectors. Normaly, just everything from 1 to 72
    ChannelSet                  fDisabledChannels;       // a list of disabled channels. not just silicon channels
    BeamBunchMap                fBeamBunches;
+   Double_t                    fGainSlope[N_DETECTORS];
 
 public:
 
@@ -149,7 +150,7 @@ public:
    Short_t         GetPolarimeterId();
    Short_t         GetPolarimeterId(short beamId, short streamId);
    UInt_t          GetFillId();
-   bool            IsRunYear(int year);
+   bool            IsRunYear(int year) const;
    void            Update(const MseMeasInfoX& run);
    void            Update(const RunPeriod& runPeriod);
    void            Update(const AsymAnaInfo& anaInfo);
@@ -187,11 +188,12 @@ public:
    ERingId         GetRingId() const;
    ETargetOrient   GetTargetOrient() const;
    UShort_t        GetTargetId() const;
+   std::vector<double> GetBiasCurrents() const;
 
    static void           GetBeamIdStreamId(Short_t polId, UShort_t &beamId, UShort_t &streamId);
    static EPolarimeterId ExtractPolarimeterId(std::string runName);
 
-   ClassDef(MeasInfo, 5)
+   ClassDef(MeasInfo, 6)
 };
 
 
