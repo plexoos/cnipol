@@ -23,11 +23,6 @@ public:
    int index;
    int flag;
 
-   struct StructSpinPattern {
-      int index;
-      int flag;
-   } spin_pattern;
- 
    void OverwriteSpinPattern(int index);
    void OverwriteFillPattern(int index);
    void MaskFillPattern();

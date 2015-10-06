@@ -7,7 +7,7 @@
 #
 # Then modify the SSH_... variables in this script accordingly
 #
-# >nohup ./copy_results_pc2pc.sh run12
+# >nohup ./run_asym_nocron.sh
 #
 
 

@@ -270,7 +270,7 @@ void CnipolAlphaHists::PostFillPassOne(DrawObjContainer *oc)
 void CnipolAlphaHists::Fill(ChannelEvent *ch)
 {
    UChar_t      chId = ch->GetChannelId();
-   ChannelData &data = ch->GetChannelData();
+   const ChannelData &data = ch->GetChannelData();
 
    string sSi("  ");
    sprintf(&sSi[0], "%02d", chId);

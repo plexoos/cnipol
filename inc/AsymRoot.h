@@ -69,7 +69,6 @@ public:
    void         CreateTrees();
    void         SetChannelEvent(ATStruct &at, long delim, unsigned chId);
    void         AddSpinFlipperMarker();
-   void         ProcessEvent() {};
    void         FillPassOne(ECut cut);
    void         FillDerivedPassOne();
    void         PostFillPassOne();
@@ -83,7 +82,6 @@ public:
    void         FillRunHists();
    void         AddChannelEvent();
    void         PrintEventMap();
-   void         PrintChannelEvent();
    void         UpdateCalibrator();
    void         UpdateFromChannelEvent();
    const Calibrator*  GetCalibrator() const;

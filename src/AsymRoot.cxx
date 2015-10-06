@@ -531,13 +531,6 @@ void AsymRoot::PrintEventMap()
 
 
 /** */
-void AsymRoot::PrintChannelEvent()
-{
-   fChannelEvent->Print();
-}
-
-
-/** */
 void AsymRoot::UpdateCalibrator()
 {
    AsymAnaInfo *anaInfo = fEventConfig->GetAnaInfo();
