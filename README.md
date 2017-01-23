@@ -21,7 +21,7 @@ Introduction
 Relativistic Heavy Ion Collider (RHIC) polarimeters at the Brookhaven National
 Lab (BNL). The first objective of this package is usually referred to as the
 "online" layer and designed to support the data acquisition and to provide
-a quick feedback by carrying a fast online analysis. The second objective is to
+a quick feedback by carrying out a fast online analysis. The second objective is to
 execute a more rigorous "offline" data analysis and present the results in
 a systematic way. It is normally referred to as the "offline" layer of
 **cnipol**.
@@ -50,7 +50,7 @@ How to configure and install cnipol
 
 The best way to start with the analysis is to clone the latest version of the
 code from the git repository. From the location where the package will be
-installed on your machine issue the following command:
+installed on your machine (such as eic0005)issue the following command:
 
     git clone https://github.com/rhicspin/cnipol.git
     cd cnipol
@@ -61,13 +61,6 @@ The source code in this case can be cloned via ssh protocol:
     git clone git@github.com:rhicspin/cnipol.git
     cd cnipol
 
-To make the processing of the data controllable and predictable we create stable
-releases of the code. The list of tagged stable releases can be viewed at
-https://github.com/rhicspin/cnipol/releases
-One may switch from the development version of the code checked out as above to
-the latest stable release by issuing the following command:
-
-    git checkout stable
 
 The analysis framework depends on a few external libraries and programs including
 
@@ -80,17 +73,17 @@ Before the code can be compiled and executed a number of environment variables
 must be set. We provide an example bash script `script/setup.sh` with predefined
 paths which should work on the eic cluster of the RACF (RHIC and ATLAS Computing
 Facility). Review and modify this script as needed to match your specific system
-configuration. This script can be ran with an optional argument for the RHIC run
-number, e.g. `run_id = 9|11|12|13`, execute in the terminal:
+configuration. An example is the variable `CNIPOL_DIR`, which the directory you setup the code. This script can be ran with an optional argument for the RHIC run
+number, e.g. `run_id = 9|11|12|13|15|17`, execute in the terminal (Note: You need to be bash shell. Type bash):
 
     source script/setup.sh [run_id]
 
-Once the environment variables are set the cnipol package can be build in
+Once the environment variables are set the cnipol package can be built in
 $CNIPOL_DIR as:
 
     mkdir build
     cd build
-    cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
+    cmake28 .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
     make
 
 The compiled executables should appear in this `build` directory along
@@ -110,7 +103,7 @@ running the cnipol executables
 option. Here we just give a few most common examples used to process regular and
 calibration data.
 
-To analyze a regular data file simply do:
+To analyze a regular data file simply do in the build directory:
 
     asym -r <meas_id>
 
@@ -145,6 +138,8 @@ executed respectively as:
 How to produce summary plots
 ============================
 
+Before you begin you should source the setup file as decribed above. 
+
 Often it is useful to see how polarization or other observables change from
 measurement to measurement during some period of time. To study such time
 dependence we developed `masym`, a program that runs on a set of measurements
@@ -178,6 +173,50 @@ invoked as:
 where `<meas_list>` is a file in `$CNIPOL_RESULTS_DIR/runXX/lists/` with a list
 of unique names corresponding to measurements recorded by the polarimeters when
 no beam was present in the RHIC.
+
+General Description of Directory Layout
+=======================================
+
+There are 7 major directories in the cnipol package:
+
+cnipol/inc/ -- This directory contains all the source code header files
+
+cnipol/src/ -- This directory contains all the cpp files
+
+cnipol/build/ -- This is build directory to compile the code using make 
+
+cnipol/webview/ --  This directory contains all the code relavent for the webpage
+
+cnipol/script/ -- This directory contains all the scripts that can quickly allow a user to run the code
+
+eicdata/eic0005/runXX/ -- This directory contains lists. The list of measuements, the list of target status, and the lists from cdev.  
+
+eicdata/eic0005/run17/ -- This directory holds all the data after processing through asym (Using 17 as an example, could be any other run number).
+
+Automating the Process
+======================
+
+First, you need to follow the link below to set up a tunnel to the blue and yellow pC machines at IP 12. This will provide you with a tunnel into the machines without requiring a password. 
+
+https://wiki.bnl.gov/rhicspin/Automated_pC_setup
+
+The name of the script to execute is `run_asym_daemon.sh`. However, the first line in the script should be changed to the location of the setup.sh and the run number. 
+
+After the tunnel has been established you can start the automated process by executing the following command: 
+    
+    nohup ./run_asym_daemon.sh > some_output_file_name
+
+and you can put an ampersand at the end of the process if you want to hide it. The ampersand will allow you to continue working in your current terminal. Regardless, the process will be running and looking for new files every 60 seconds. 
+
+Alpha Calibration File
+======================
+
+During the course of the run, a long alpha measurment should occur and create the alpha calibration files needed for properly processing the measurments. Once this file is created you will need to edit the following code to include the file name of the alpha calibration. You can find the code at the following: 
+
+    /contrib/RunPeriod.inc
+    
+Make sure to change the start_time, the polarimeter_id, the alpha_calib_run_name, and possibly the gain_slope (may not need to include the gain_slope at all). The other parameters are the default tdc and adc cuts on the bananas plots.
+
 
 
 Other polarimetry software packages
